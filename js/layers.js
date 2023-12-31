@@ -42,7 +42,7 @@ addLayer("Ktr", {
         return [2,3,4,5,6,7,8,14,22,31,99999]
     },
     arkFullReq(){
-        if(player.Ktr.ark.lt(10)) req = tmp.Ktr.arkReq[player.Ktr.ark.add(1)]
+        if(player.Ktr.ark.lt(10)) req = n(tmp.Ktr.arkReq[player.Ktr.ark.add(1)])
         if(player.Ktr.ark.gte(10) && player.Ktr.ark.lt(20)) req = new Decimal(2500).pow(player.Ktr.ark.sub(10)).mul(1e19)
         if(player.Ktr.ark.gte(20) && player.Ktr.ark.lt(30)) req = new Decimal(2.5e6).pow(player.Ktr.ark.sub(19)).mul(1e48)
         if(player.Ktr.ark.gte(30) && player.Ktr.ark.lt(40)) req = new Decimal(7e9).pow(player.Ktr.ark.sub(29)).mul(1e110)
