@@ -67,7 +67,7 @@
 	border-color: rgba(0, 0, 0, 0.125);
 	color: rgba(0, 0, 0, 0.5);
 	width: 300px;
-	height: 600px;
+	height: 700px;
 	font-size: 15px;
 	border-radius: 10px;
 	margin: 10px;
@@ -200,6 +200,16 @@
 	background-color: white;
 	cursor: pointer;
 }
+.hokma {
+	border: 3px solid rgba(0, 0, 0, 0.125);
+	border-radius: 100%;
+	margin: 5px;
+	width: 70px;
+	height: 70px;
+	color: black;
+	background-color: gray;
+	cursor: pointer;
+}
 .info:hover {
 	box-shadow: 0 0 7px 3px white;
 	transform: scale(105%) ;
@@ -234,7 +244,7 @@
     cursor: pointer;
 }
 
-#buyable-Ktr-Ktr-sta{
+#buyable-Ktr-Ktr-g-h1{
 	color: black;
     background: skyblue;
       background-image:repeating-linear-gradient(45deg,
@@ -247,13 +257,34 @@
       hsla(0,0%,100%,.2) 15px,
       transparent 0,
       transparent 30px);
-	  height: 100px;
+	  height: 150px;
 	  width: 600px;
       background-size: 1000% 1000%;
       background-position: 0% 0%;
-      animation: climb 120s linear infinite;
     border: 3px solid rgb(110, 177, 203);
     box-shadow: 0px 5px 3px rgb(110, 177, 203);
+    cursor: pointer;
+}
+
+#buyable-Ktr-Ktr-g-h2{
+	color: black;
+	background-image: repeating-conic-gradient(skyblue 0 25%, rgb(166, 224, 247) 0 50%);
+	background-size: 32px 32px;
+    border: 3px solid skyblue;
+	height: 150px;
+	width: 600px;
+    background-position: 0% 0%;
+    cursor: pointer;
+}
+
+#buyable-Ktr-Ktr-g-h3{
+	color: black;
+	background: linear-gradient(45deg, skyblue 50%, rgb(166, 224, 247) 0);
+    background-size: 14px 14px;
+    border: 3px solid skyblue;
+	height: 150px;
+	width: 600px;
+    background-position: 0% 0%;
     cursor: pointer;
 }
 

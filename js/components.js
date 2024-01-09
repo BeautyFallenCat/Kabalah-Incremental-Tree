@@ -596,7 +596,7 @@ function loadVue() {
 	})
 	Vue.component('info-thing', {
 		props: ['layer'],
-		template:`<button class="info" @click="ketherStory()">Story {{player.Ktr.newStory?"(New!!)":""}}</button>`
+		template: `<button class="info kether" @click="ketherStory()">Story {{player.Ktr.newStory?"(New!!)":""}}</button>`
 	})
 
 	// SYSTEM COMPONENTS
@@ -799,3 +799,45 @@ function getBonusDesc()
 	}
 	return formatWhole(nextBonus-1)+" ,"+tmp.Ktr.ArkDescs[nextBonus]   
 }
+
+var texts =
+    [
+		"0''''1''''2''''3''''3.5''''4''''4.4''''4.7''''5 Here is a ruler but SOFTCAPPED",
+        "Hello world",
+        "Why can't you reach next sephirah? Because the ranking of last sephirah haven't Reach S",
+        "See You Next Time",
+        "Let's get HIGHER!",
+        "72788433374733678633778263464",
+        "One Two Three Fire!",
+        "Guess how many times you need to reload to see this news again ￣︶￣",
+        "This is a news belonging to the Heart Gate update version!",
+        "Let's guess how much useful information there is here",
+        "Ah. What news should I show you",
+        "Have you ever counted how many times you've seen this news?",
+        "WHAT DO YOU KNOW WHAT DO YOU PLAY WHAT DO YOU REMEMBER WHAT DO YOU LOVE",
+        "Yooooooooooooooooooo",
+        "This update adds your total game time to your global time speed, is it impressive?",
+        "Confusing News",
+        "Redemption",
+        "This is the story for one character of misery",
+        "Hit me with the HARDCORE!!!",
+        "5.555555555 hours until the update",
+        "Be careful not to be discovered",
+		"This news bar is at 50fps while the game is at 20fps, so you should give 2.5x respect to this bar, isn't it?",
+		"The instability of Fallen_Cat's Method is 100-e^ipi%. If this number go beyond 100%, the game will be broken.",
+		"F1.8e308 is the limit of game number, not the limit of Fallen_Cat's idea.",
+		"Breaking news! A Memory Crystal mine is collapsed and 114 miners lost their lives.",
+		"Legend has it that within the delicate and fragile butterfly body, there is also the power to trigger hurricanes. This butterfly, composed of pure wind, is undoubtedly waiting for the day when another storm is summoned"
+    ]
+var p = 50 + (document.body.clientWidth / 2.4)
+var l = -50 - (newsText.innerText.length * 20)
+var newsTimer = setInterval(function () {
+    p -= 1
+    if (p <= l) {
+        newsText.innerText = texts[Math.floor(Math.random() * texts.length)]
+        newsText.style.width = (newsText.innerText.length * 16).toString() + "px"
+        l = -50 - (newsText.innerText.length * 16)
+        p = 50 + (document.body.clientWidth / 2.4)
+    }
+    newsText.style.left = p.toFixed(1) + "px"
+}, 10)

@@ -24,6 +24,8 @@ addLayer("Ktr", {
         memoryCrystal: n(0),
         gateLayer: 0,
         content: '',
+        gate1: 0,
+        lastCrystal: n(0),
     }},
     resetsNothing(){
         return player.Ktr.storyUnlocked >= 9
@@ -56,7 +58,7 @@ addLayer("Ktr", {
         return eff
     },
     solarLayer(){
-        let layer = ["Malky Way System","Local Group of Galaxies","Virgo Supercluster","Observable Universe","Multiverse"]
+        let layer = ["Milky Way System","Local Group of Galaxies","Virgo Supercluster","Observable Universe","Multiverse"]
         return layer
     },
     solarReq(){
@@ -119,6 +121,7 @@ addLayer("Ktr", {
     },
     solarEff(){
         let eff = tmp.Ktr.solarEnergy.add(1).pow(0.5)
+        if(player.Ktr.storyUnlocked >= 9) eff = eff.mul(player.Ktr.memoryCrystal.add(1).pow(2))
         return eff
     },
     arkEff(){
@@ -129,7 +132,13 @@ addLayer("Ktr", {
     gateEff(){
         let power = n(0.05)
         power = power.mul(player.Ktr.realTime.add(1).log10().min(4))
+        if(layers.Ktr.buyables['Ktr-g-h2'].enabled() && player.Ktr.storyUnlocked >= 9) power = power.add(0.05)
+        if(layers.Ktr.buyables['Ktr-g-h3'].enabled() && player.Ktr.storyUnlocked >= 9) power = power.mul(2)
         return power
+    },
+    antimatter(){
+        let antimatter = Decimal.pow(2,player.Ktr.universalTime.sub(10)).sub(1).max(0)
+        return antimatter
     },
     color: "#FFFFFF",
     requires: new Decimal(10), // Can be a function that takes requirement increases into account
@@ -409,6 +418,7 @@ addLayer("Ktr", {
                 if(tmp.Ktr.memoryLevel.gte(75)) gain = gain.mul(1000)
                 if(player.Ktr.activeChallenge == 'Ktr-g1') gain = gain.pow(tmp.Ktr.gateEff)
                 if(player.Ktr.storyUnlocked >= 9) gain = gain.mul(player.Ktr.timeWrap)
+                if(tmp.Ktr.antimatter.gt(player.Ktr.stallar)) gain = n(0)
                 return gain
             },
             display() {return "Absorb some stallar energy from your stallars.<br>+"+formatWhole(this.gain())+' stallar points until '+format(player.Ktr.stallarFreeze)+' sec'},
@@ -601,9 +611,33 @@ addLayer("Ktr", {
                 return {'box-shadow':'0px 0px 5px '+(player.timePlayed%2+5)+'px inset #480099','background':`linear-gradient(to right,#480099 ${format(tmp.Ktr.celestialProgress[4])}%,black ${format(tmp.Ktr.celestialProgress[4].add(0.25))}%)`, 'color':'white', 'min-height':'80px', 'width':'600px','border-radius':'5px','font-size':'13px','margin-left':'5px','border-color':'#480099'}
             },
         },
+        'Ktr-g1k':{
+            title() {return "Time ×1k"},
+            canClick() {return player.Ktr.timeWrap != 1000 && player.Ktr.activeChallenge != 'Ktr-g1'},
+            style(){
+                if(player.Ktr.timeWrap != 1000) return {'box-shadow':'0px 0px 5px '+(player.timePlayed%2+5)+'px dodgerblue', 'background-color':'dodgerblue', 'color':'black', 'min-height':'50px', 'width':'100px','border-radius':'5px','font-size':'13px' }
+                else return {'min-height':'50px', 'width':'100px','border-radius':'5px','font-size':'13px','background-color':'black','color':'white','border-color':'dodgerblue'}
+            },
+            onClick() {
+                player.Ktr.timeWrap = n(1000)
+            },
+            unlocked(){return player.Ktr.memoryCrystal.gte(1e10)}
+        },
+        'Ktr-g10':{
+            title() {return "Time ×10"},
+            canClick() {return player.Ktr.timeWrap != 10 && player.Ktr.activeChallenge != 'Ktr-g1'},
+            style(){
+                if(player.Ktr.timeWrap != 10) return {'box-shadow':'0px 0px 5px '+(player.timePlayed%2+5)+'px deepskyblue', 'background-color':'deepskyblue', 'color':'black', 'min-height':'50px', 'width':'100px','border-radius':'5px','font-size':'13px' }
+                else return {'min-height':'50px', 'width':'100px','border-radius':'5px','font-size':'13px','background-color':'black','color':'white','border-color':'deepskyblue'}
+            },
+            onClick() {
+                player.Ktr.timeWrap = n(10)
+            },
+            unlocked(){return player.Ktr.memoryCrystal.gte(1e6)}
+        },
         'Ktr-g2':{
             title() {return "Time ×2"},
-            canClick() {return player.Ktr.timeWrap != 2 && !player.Ktr.activeChallenge == 'Ktr-g1'},
+            canClick() {return player.Ktr.timeWrap != 2 && player.Ktr.activeChallenge != 'Ktr-g1'},
             style(){
                 if(player.Ktr.timeWrap != 2) return {'box-shadow':'0px 0px 5px '+(player.timePlayed%2+5)+'px skyblue', 'background-color':'skyblue', 'color':'black', 'min-height':'50px', 'width':'100px','border-radius':'5px','font-size':'13px' }
                 else return {'min-height':'50px', 'width':'100px','border-radius':'5px','font-size':'13px','background-color':'black','color':'white','border-color':'skyblue'}
@@ -633,6 +667,30 @@ addLayer("Ktr", {
             onClick() {
                 player.Ktr.timeWrap = n(0.5)
             },
+        },
+        'Ktr-g1/4':{
+            title() {return "Time ×1/4"},
+            canClick() {return player.Ktr.timeWrap != 0.25},
+            style(){
+                if(player.Ktr.timeWrap != 0.25) return {'box-shadow':'0px 0px 5px '+(player.timePlayed%2+5)+'px #FA8072', 'background-color':'#FA8072', 'color':'black', 'min-height':'50px', 'width':'100px','border-radius':'5px','font-size':'13px' }
+                else return {'min-height':'50px', 'width':'100px','border-radius':'5px','font-size':'13px','background-color':'black','color':'white','border-color':'#FA8072'}
+            },
+            onClick() {
+                player.Ktr.timeWrap = n(0.25)
+            },
+            unlocked(){return player.Ktr.memoryCrystal.gte(1e6)}
+        },
+        'Ktr-g1/8':{
+            title() {return "Time ×1/8"},
+            canClick() {return player.Ktr.timeWrap != 0.125},
+            style(){
+                if(player.Ktr.timeWrap != 0.125) return {'box-shadow':'0px 0px 5px '+(player.timePlayed%2+5)+'px red', 'background-color':'red', 'color':'black', 'min-height':'50px', 'width':'100px','border-radius':'5px','font-size':'13px' }
+                else return {'min-height':'50px', 'width':'100px','border-radius':'5px','font-size':'13px','background-color':'black','color':'white','border-color':'red'}
+            },
+            onClick() {
+                player.Ktr.timeWrap = n(0.125)
+            },
+            unlocked(){return player.Ktr.memoryCrystal.gte(1e10)}
         },
     },
     buyables:{
@@ -967,28 +1025,68 @@ addLayer("Ktr", {
                 else return {'height':'150px', 'width':'150px','border-radius':'50%','background-color':'black','color':'white','border-color':'#c999ff','margin-left':'5px'}
             },
         },
+        'Ktr-g-h1': {
+            title() {return "<h3>[i] Sea of Mystery "+(this.enabled()? quickColor('(Stable)','green'):quickColor('(Disrupted)','red'))},
+            display() {let dis = '<h2>[Kether] The ultimate beauty of truth is achieved through constantly overcoming oneself in every failure and reflection. If every time you enter the Heart Gate, the result is at least 7 times better than the previous one, I think you have achieved this.'
+        if(!this.enabled()) {if(player.Ktr.realTime.lt(300)) dis += '<br><br>'+quickColor('Reach 300s of reality time to discover more.','grey')
+        else dis += '<br><br>'+quickColor('Every time you exit the Heart Gate, you need to obtain at least 7 times the memory crystal obtained from the last exit for 3 times in a row to stabilize it.','red')}
+        else dis += '<br><br>'+quickColor('Memory Crystal gain rate ×20','green')
+        return dis
+        },
+            enabled() {return player.Ktr.gate1 >= 3},
+            canAfford() {return false},
+            unlocked() {return player.Ktr.storyUnlocked >= 9}
+        },
+        'Ktr-g-h2': {
+            title() {return "<h3>[ii] Sea of Illusion "+(this.enabled()? quickColor('(Stable)','green'):quickColor('(Disrupted)','red'))},
+            display() {let dis = '<h2>[Kether] The law of balance undoubtedly applies to all things in the interstellar world. You can deeply understand this in the fuel usage of the ark.'
+        if(!this.enabled()) {if(player.Ktr.realTime.lt(1000)) dis += '<br><br>'+quickColor('Reach 1000s of reality time to discover more.','black')
+        else dis += '<br><br>'+quickColor('Let all of your upgrades in remote space go beyond lv.6 ( Except for Ktr-s-d3, it only requires to go beyond lv.4) to stabilize it.','red')}
+        else dis += '<br><br>'+quickColor('Heart Gate nerf expontent +^0.05','green')
+        return dis
+        },
+            enabled() {return getBuyableAmount('Ktr','Ktr-s-d1').gte(7) && getBuyableAmount('Ktr','Ktr-s-d2').gte(7) && getBuyableAmount('Ktr','Ktr-s-d3').gte(5) && getBuyableAmount('Ktr','Ktr-s-d4').gte(7) && getBuyableAmount('Ktr','Ktr-s-d5').gte(7) && getBuyableAmount('Ktr','Ktr-s-d6').gte(7)},
+            canAfford() {return false},
+            unlocked() {return player.Ktr.storyUnlocked >= 9 && player.Ktr.memoryCrystal.gte(1e6)}
+        },
+        'Ktr-g-h3': {
+            title() {return "<h3>[iii] Sea of Dream "+(this.enabled()? quickColor('(Stable)','green'):quickColor('(Disrupted)','red'))},
+            display() {let dis = '<h2>[Kether] All miracles in the universe are built on the right foundation of time. If you can freeze time around integer moments, then you have the potential to master the time of all things.'
+        if(!this.enabled()) {if(player.Ktr.realTime.lt(2000)) dis += '<br><br>'+quickColor('Reach 2000s of reality time to discover more.','black')
+        else dis += '<br><br>'+quickColor('Change timespan rate to x1/8 and wait until your universal time can be divisible by 60s(1min) to stabilize it.','red')}
+        else dis += '<br><br>'+quickColor('Heart Gate nerf expontent x2','green')
+        return dis
+        },
+            enabled() {return player.Ktr.universalTime.gte(30) && player.Ktr.universalTime.toNumber() % 60 <= 2 && player.Ktr.timeWrap < n(0.2)},
+            canAfford() {return false},
+            unlocked() {return player.Ktr.storyUnlocked >= 9 && player.Ktr.memoryCrystal.gte(1e10)}
+        },
     },
     challenges:{
         'Ktr-g1':{
-            name() {return "Heart Gate -"+((this.locked())?'(Locked)':(inChallenge(this.layer,this.id)?("("+formatWhole(this.gain())+")"):("(Inactive)")))},
+            name() {return "Heart Gate "+((this.locked())?'(Locked)':(player.Ktr.activeChallenge == 'Ktr-g1'?("("+formatWhole(this.gain())+")"):("(Inactive)")))},
             text() {return "☭"},
             locked() {return player.Ktr.storyUnlocked < 9},
             exp: "",
             color: '#FFFFFF',
             challengeDescription() {
-                let desc = "↑↑Click the symbol of current saphirah to enter the Heart Gate!<br>——————————————————<br>Heart Gate Effect:<br>1) Extremely Decrease the generation of stallar points. But it also gains a raising exponent based on the real time after entrying the gate.<br>2) Antimatter will increase after a short time period. If it go beyond your stallar points, you will gain no stallar points.<br>3)Gains memory crystal after exiting the gate.<br>3) Yellow Dwarf have no effect.<br>——————————————————<br>This feature is not completed yet. If you reached there, congratulations, You have bet the game!"
+                let desc = "↑↑Click the symbol of current saphirah to enter the Heart Gate!<br>——————————————————<br>Heart Gate Effect:<br>1) Extremely Decrease the generation of stallar points. But it also gains a raising exponent based on the real time after entrying the gate.<br>2) Antimatter will increase after a short time period. If it go beyond your stallar points, you will gain no stallar points.<br>3)Gains memory crystal after exiting the gate.<br>3) Yellow Dwarf have no effect.<br>——————————————————<br>Reach 1e6 and 1e10 memory crystals to unlock more content.<br>——————————————————Goal: 1e20 memory crystals<br>Reward: Unlock Hokma."
                 return desc
             },
             gain(){
                 let gain = player.Ktr.stallar.add(1).pow(0.22).floor()
+                if(layers.Ktr.buyables['Ktr-g-h1'].enabled()) gain = gain.mul(20)
+                if(gain.gte(1e20)) gain = softcap(gain,'root',n(1e20),15)
                 return gain
             },
             style() {
-                if(inChallenge(this.layer,this.id)) return {'background-color':'#dddddd','box-shadow':'0px 0px 6px 6px #dddddd'}
+                if(player.Ktr.memoryCrystal.gte(1e20)) return {'background-color':'#44FF44','box-shadow':'0px 0px 3px 3px #44FF44'}
+                else if(player.Ktr.activeChallenge == 'Ktr-g1') return {'background-color':'#dddddd','box-shadow':'0px 0px 6px 6px #dddddd'}
                 else if(!this.locked()) return {'background-color':'#dddddd','box-shadow':'0px 0px 3px 3px #dddddd'}
                 else return {'background-color':'#888888'}
             },
             onEnter() {
+                player.Ktr.timeWrap = n(1)
                 for(var i = 1; i <= 6; i++){
                     setBuyableAmount('Ktr','Ktr-s'+i,n(0))
                 }
@@ -996,7 +1094,10 @@ addLayer("Ktr", {
             },
             onExit()
             {
+                if(this.gain().gte((player.Ktr.lastCrystal).mul(7))) player.Ktr.gate1 += 1
+                else player.Ktr.gate1 = 0;
                 player.Ktr.memoryCrystal = player.Ktr.memoryCrystal.add(this.gain())
+                player.Ktr.lastCrystal = this.gain()
                 player.Ktr.universalTime = n(0)
                 player.Ktr.realTime = n(0)
             },
@@ -1028,6 +1129,7 @@ addLayer("Ktr", {
             progress() { return player.Ktr.stallar.add(1).log(10).div(245) },
             fillStyle() { if(this.progress().lt(1)) return {'background-color':'#999999'}
             else return {'background-color':'green'}},
+            unlocked(){ return player.Ktr.storyUnlocked < 9}
         },
         'Ktr-g2': {
             direction: RIGHT,
@@ -1037,15 +1139,7 @@ addLayer("Ktr", {
             progress() { return tmp.Ktr.memoryLevel.div(100) },
             fillStyle() { if(this.progress().lt(1)) return {'background-color':'#999999'}
             else return {'background-color':'green'}},
-        },
-        'Ktr-g2': {
-            direction: RIGHT,
-            width: 600,
-            height: 30,
-            display() { return 'Req2: '+formatWhole(tmp.Ktr.memoryLevel)+' / '+formatWhole(100)+' memory dipth'},
-            progress() { return tmp.Ktr.memoryLevel.div(100) },
-            fillStyle() { if(this.progress().lt(1)) return {'background-color':'#999999'}
-            else return {'background-color':'green'}},
+            unlocked(){ return player.Ktr.storyUnlocked < 9}
         },
         'Ktr-g3': {
             direction: RIGHT,
@@ -1055,6 +1149,7 @@ addLayer("Ktr", {
             progress() { return n(player.Ktr.solarLayer / 3) },
             fillStyle() { if(this.progress().lt(1)) return {'background-color':'#999999'}
             else return {'background-color':'green'}},
+            unlocked(){ return player.Ktr.storyUnlocked < 9}
         },
     },
     gainMult() { // Calculate the multiplier for main currency from bonuses
@@ -1470,20 +1565,31 @@ addLayer("Ktr", {
                     ['bar','Ktr-g2'],
                     ['bar','Ktr-g3'],
                     "blank",
+                    ['display-text',function(){if(player.Ktr.storyUnlocked >= 9)return '<h4>You have collected a total of   '+quickBigColor(formatWhole(player.Ktr.memoryCrystal),'white') +' memory crystal. Itself boosts the effect of solar energy.(Uneffected by the nerf of heart gate)'}],
+                    ['display-text',function(){if(player.Ktr.activeChallenge == 'Ktr-g1')return '<h4>Universal timespan: '+quickBigColor(formatTime(player.Ktr.universalTime),'white')}],
+                    ['display-text',function(){if(player.Ktr.activeChallenge == 'Ktr-g1')return '<h4>Reality timespan: '+quickBigColor(formatTime(player.Ktr.realTime),'white')+', translated to a stallar nerf of '+quickBigColor('^'+format(tmp.Ktr.gateEff),'white')}],
+                    ['display-text',function(){if(player.Ktr.activeChallenge == 'Ktr-g1')return '<h4>You have '+quickBigColor(formatWhole(tmp.Ktr.antimatter),'white')+' antimetter.'}],
+                    "blank",
                     ['row',[['challenge','Ktr-g1'],["column", [["raw-html", function() {}],
                     "blank",['display-text',function(){return '<h3>[Black Hole controller]<br>Change the stallar and universal timespan rate.'}],
-                   ['column',["blank",["clickable",'Ktr-g2'],["clickable",'Ktr-g1'],["clickable",'Ktr-g1/2']]],
+                   ['column',["blank",["clickable",'Ktr-g1k'],["clickable",'Ktr-g10'],["clickable",'Ktr-g2'],["clickable",'Ktr-g1'],["clickable",'Ktr-g1/2'],["clickable",'Ktr-g1/4'],["clickable",'Ktr-g1/8']]],
                    "blank",
                    ],
                    {
                        "color":"white",
                        "width":"300px",
-                       "height":"600px",
+                       "height":"700px",
                        "border-color":"#FFFFFF",
                        "border-width":"3px",
                        "background-color":"black",
                    },
                 ]]],
+                'blank',
+                ['display-text',function(){return '<h4>'+quickColor("[Hints] Kether's Memory Gate has three unique but unstable memory channels that only become stable and provide bonuses when certain specific conditions are met. If the stable conditions of the memory channel cannot be determined based on existing clues, it can be unlocked by leaving it idle in the Heart Gate for a period of time.",'grey')}],
+                'blank',
+                ['buyable','Ktr-g-h1'],
+                ['buyable','Ktr-g-h2'],
+                ['buyable','Ktr-g-h3'],
                 ],
                 unlocked(){return tmp.Ktr.memoryLevel.gte(100)},
                 buttonStyle(){return {'background':'linear-gradient(to right,white 11%, grey 92%)','color':'black','box-shadow':'2px 2px 2px grey'}}
@@ -1502,6 +1608,50 @@ addLayer("Ktr", {
             player.Ktr.universalTime = player.Ktr.universalTime.add(n(diff).mul(player.Ktr.timeWrap))
         }
     },
+})
+addLayer("Hkm", {
+    startData() { return {                  // startData is a function that returns default data for a layer. 
+        unlocked: true,                     // You can add more variables here to add them to your layer.
+        points: new Decimal(0),
+        storyUnlocked: 0,
+        newStory: false,             // "points" is the internal name for the main resource of the layer.
+    }},
+    symbol(){return "Hkm<sup>"+player.Hkm.storyUnlocked},
+    color: "grey",                       // The color for this layer, which affects many elements.
+    resource: "hokma points",            // The name of this layer's main prestige resource.
+    row: 1,                                 // The row this layer is on (0 is the first row).
+
+    baseResource: "points",                 // The name of the resource your prestige gain is based on.
+    baseAmount() { return player.points },  // A function to return the current amount of baseResource.
+
+    requires: new Decimal(9e9999),              // The amount of the base needed to  gain 1 of the prestige currency.
+                                            // Also the amount required to unlock the layer.
+
+    type: "normal",                         // Determines the formula used for calculating prestige currency.
+    exponent: 0.5,
+    branches: ['Ktr'],                          // "normal" prestige gain is (currency^exponent).
+
+    gainMult() {                            // Returns your multiplier to your gain of the prestige resource.
+        return new Decimal(1)               // Factor in any bonuses multiplying gain here.
+    },
+    gainExp() {                             // Returns the exponent to your gain of the prestige resource.
+        return new Decimal(1)
+    },
+
+    layerShown() { return player.Ktr.memoryCrystal.gte(1e20) },          // Returns a bool for if this layer's node should be visible in the tree.
+
+    upgrades: {
+        // Look in the upgrades docs to see what goes here!
+    },
+    tabFormat:{
+        'Time Machine':{
+            content:[
+                // ['display-text','<button class="info Hokma" onClick="ketherStory()">Story</button>'],
+                'main-display',
+                'prestige-button'
+            ]
+        }
+    }
 })
 
 function ketherStory(){
