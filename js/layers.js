@@ -1591,7 +1591,7 @@ addLayer("Ktr", {
                 ['buyable','Ktr-g-h2'],
                 ['buyable','Ktr-g-h3'],
                 ],
-                unlocked(){return tmp.Ktr.memoryLevel.gte(100)},
+                unlocked(){return tmp.Ktr.memoryLevel.gte(100) || player.Ktr.storyUnlocked >= 9},
                 buttonStyle(){return {'background':'linear-gradient(to right,white 11%, grey 92%)','color':'black','box-shadow':'2px 2px 2px grey'}}
             },
     },
