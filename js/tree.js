@@ -13,6 +13,16 @@ var layoutInfo = {
 addNode("blank", {
     layerShown: "ghost",
 }, 
+),
+addNode("blank2", {
+    layerShown: "ghost",
+    row: "side"
+}, 
+)
+addNode("blank3", {
+    layerShown: "ghost",
+    row: "side"
+}, 
 )
 
 

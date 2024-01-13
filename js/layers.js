@@ -26,7 +26,21 @@ addLayer("Ktr", {
         content: '',
         gate1: 0,
         lastCrystal: n(0),
+        resetedMemory: false,
+        respeced: false,
     }},
+    doReset(resettingLayer) {
+        let keep = []
+        if (hasMilestone('Hkm','Hkm-2') && resettingLayer == 'Hkm') keep.push('upgrades')
+        if (hasMilestone('Hkm','Hkm-7') && resettingLayer == 'Hkm') keep.push('memoryCrystal')
+        if (hasMilestone('Hkm','Hkm-8') && resettingLayer == 'Hkm') keep.push('distant')
+        if (hasMilestone('Hkm','Hkm-8') && resettingLayer == 'Hkm') keep.push('remote')
+        if (hasMilestone('Hkm','Hkm-12') && resettingLayer == 'Hkm') keep.push('buyables')
+        if (hasMilestone('Hkm','Hkm-12') && resettingLayer == 'Hkm') keep.push('ark')
+        if (hasMilestone('Hkm','Hkm-12') && resettingLayer == 'Hkm') keep.push('fuel')
+        if (hasMilestone('Hkm','Hkm-12') && resettingLayer == 'Hkm') keep.push('totalFuel')
+        if (layers[resettingLayer].row > this.row) layerDataReset(this.layer, keep)
+    },
     resetsNothing(){
         return player.Ktr.storyUnlocked >= 9
     },
@@ -35,6 +49,7 @@ addLayer("Ktr", {
         for (var i=0; i<=5; i++){
             level[i] = player.Ktr.solarPower[i].add(1).log(tmp.Ktr.celestialRoot[i]).floor()
         }
+        if(level[0].gte(100)) level[0] = n(100)
         return level
     },
     arkReq(){
@@ -137,6 +152,7 @@ addLayer("Ktr", {
         return power
     },
     antimatter(){
+        if(hasMilestone('Hkm','Hkm-6')) return n(0)
         let antimatter = Decimal.pow(2,player.Ktr.universalTime.sub(10)).sub(1).max(0)
         return antimatter
     },
@@ -156,7 +172,7 @@ addLayer("Ktr", {
         6: "unlock yellow dwarf.",
         7: "every brown dwarf also gives 0.05 extra yellow dwarves.",
         8: "keep brown & yellow dwarf on reset.",
-        14: "unlock white dwarf, and auto buy every star.",
+        14: "unlock white dwarf.",
         22: "Unlock a row of new distant space upgrades. Reset for ark won't longer reset your stars.",
         31: "Boost all resource in remote space by ×5, and every ark after this increases this number by ×1.2.",
         99999: "???",
@@ -407,17 +423,18 @@ addLayer("Ktr", {
     },
     clickables:{
         'Ktr-s1':{
-            title() {return "Ascorb Energy<br>"},
+            title() {return "Absorb Energy<br>"},
             gain() {
                 let gain = n(1)
                 if(player.Ktr.ark.gte(1)) gain = gain.mul(tmp.Ktr.arkEff)
                 gain = gain.mul(buyableEffect('Ktr','Ktr-s1'))
                 if(player.Ktr.ark.gte(1)) gain = gain.mul(layers.Ktr.buyables['Ktr','Ktr-s3'].effect())
-                if(tmp.Ktr.memoryLevel.lt(42) && tmp.Ktr.memoryLevel.gte(15)) gain = gain.div(100)
+                if(tmp.Ktr.memoryLevel.lt(42) && tmp.Ktr.memoryLevel.gte(15) && !hasAchievement('Ain','Hkm-4')) gain = gain.div(100)
                 if(tmp.Ktr.memoryLevel.gte(42)) gain = gain.mul(100)
                 if(tmp.Ktr.memoryLevel.gte(75)) gain = gain.mul(1000)
                 if(player.Ktr.activeChallenge == 'Ktr-g1') gain = gain.pow(tmp.Ktr.gateEff)
-                if(player.Ktr.storyUnlocked >= 9) gain = gain.mul(player.Ktr.timeWrap)
+                if(player.Ktr.storyUnlocked >= 9 || hasMilestone('Hkm','Hkm-6')) gain = gain.mul(player.Ktr.timeWrap)
+                if(hasMilestone('Hkm','Hkm-1')) gain = gain.mul(tmp.Hkm.effect)
                 if(tmp.Ktr.antimatter.gt(player.Ktr.stallar)) gain = n(0)
                 return gain
             },
@@ -480,6 +497,7 @@ addLayer("Ktr", {
                     setBuyableAmount('Ktr','Ktr-s'+i,n(0))
                 }
                 player.Ktr.stallar = n(0)
+                player.Ktr.respeced = true
             },
             unlocked(){return player.Ktr.distant}
         },
@@ -606,7 +624,7 @@ addLayer("Ktr", {
                 player.Ktr.solarPower[4] = player.Ktr.solarPower[4].add(tmp.Ktr.celestialGain[4].mul(0.05))
             },
             unlocked(){return player.Ktr.solarLayer >= 3},
-            tooltip() {return quickBackgColor("[Mass] 6e10 Msun<br>[Temp.] -273.15K",'#480099')+'<br><br>Boost solar energy gain and generate extra yellow dwarf.<br>Effect1: ×'+format(this.effect1())+"<br>Effect2: +"+format(this.effect2())+"<br>Hold and gain "+format(tmp.Ktr.celestialPerSec[4])+"% quasi-star energy per second."},
+            tooltip() {return quickBackgColor("[Mass] 6e10 Msun<br>[Temp.] -273.15K",'#480099')+'<br><br>Boost solar energy gain and generate extra yellow dwarf.<br>Effect1: ×'+format(this.effect1())+"<br>Effect2: +"+format(this.effect2())+"<br>Hold and gain "+format(tmp.Ktr.celestialPerSec[4])+"% black hole-energy per second."},
             style(){
                 return {'box-shadow':'0px 0px 5px '+(player.timePlayed%2+5)+'px inset #480099','background':`linear-gradient(to right,#480099 ${format(tmp.Ktr.celestialProgress[4])}%,black ${format(tmp.Ktr.celestialProgress[4].add(0.25))}%)`, 'color':'white', 'min-height':'80px', 'width':'600px','border-radius':'5px','font-size':'13px','margin-left':'5px','border-color':'#480099'}
             },
@@ -728,7 +746,7 @@ addLayer("Ktr", {
                 return cost
             },
             buy(){
-                player.Ktr.points = player.Ktr.points.sub(this.cost())
+                if(!hasMilestone('Hkm','Hkm-4')) player.Ktr.points = player.Ktr.points.sub(this.cost())
                 setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
             },
             style() {
@@ -745,7 +763,7 @@ addLayer("Ktr", {
                 return cost
             },
             buy(){
-                player.Ktr.stallar = player.Ktr.stallar.sub(this.cost())
+                if(!hasMilestone('Hkm','Hkm-4')) player.Ktr.stallar = player.Ktr.stallar.sub(this.cost())
                 setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
             },
             style() {
@@ -786,6 +804,7 @@ addLayer("Ktr", {
                 setBuyableAmount('Ktr','Ktr-m1',n(0))
                 setBuyableAmount('Ktr','Ktr-m2',n(0))
                 setBuyableAmount('Ktr','Ktr-m3',n(0))
+                player.Ktr.resetedMemory = true
             }
         },
         'Ktr-s1': {
@@ -813,7 +832,7 @@ addLayer("Ktr", {
         'Ktr-s2': {
             title() {return '<h3>[Ktr-s2] Brown Dwarf<br>Lv.'+getBuyableAmount(this.layer,this.id)},
             tooltip() {return quickBackgColor("[Mass] 20 Mjupitar<br>[Temp.] 1000K","#AA5500")+'<br><br>Cut stallar absorbing interval into half.<br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: /"+formatWhole(this.effect())+"<br>Cost: "+format(this.cost())+" Stallar points"},
-            canAfford() {return player.Ktr.stallar.gte(this.cost())},
+            canAfford() {return player.Ktr.stallar.gte(this.cost()) && getBuyableAmount(this.layer,this.id).lt(200)},
             cost(x){
                 let cost = Decimal.pow(n(1.8), new Decimal(x).pow(1.5)).mul(10).floor()
                 return cost
@@ -863,7 +882,7 @@ addLayer("Ktr", {
             },
             unlocked(){return player.Ktr.ark.gte(5)},
             effect(x){
-                let eff = Decimal.pow(n(4).add(getBuyableAmount('Ktr','Ktr-s-d1').gte(1)? buyableEffect('Ktr','Ktr-s-d1') : 0), n(x).add(player.Ktr.ark.gte(6)? getBuyableAmount('Ktr','Ktr-s1').mul(0.05):0)).sub(1)
+                let eff = Decimal.pow(n(4).add(getBuyableAmount('Ktr','Ktr-s-d1').gte(1)? buyableEffect('Ktr','Ktr-s-d1') : 0), n(x).add(player.Ktr.ark.gte(6)? getBuyableAmount('Ktr','Ktr-s1').mul(0.05):0).add(hasMilestone('Hkm','Hkm-1')? 1 : 0)).sub(1)
                 if(hasUpgrade('Ktr','Ktr-15')) eff = eff.pow(3)
                 if(player.Ktr.remote) eff = eff.mul(tmp.Ktr.solarEff.sqrt())
                 return eff
@@ -902,7 +921,7 @@ addLayer("Ktr", {
         'Ktr-s-d1': {
             title() {return '<h3>[Ktr-s-d1] Perseus Arm<br>Lv.'+getBuyableAmount(this.layer,this.id)},
             tooltip() {return 'Add .3 to the base of yellow dwarf.<br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: +"+format(this.effect())+"<br>Cost: "+formatWhole(this.cost())+" Ark fuel"},
-            canAfford() {return player.Ktr.fuel.gte(this.cost())},
+            canAfford() {return player.Ktr.fuel.gte(this.cost()) && getBuyableAmount(this.layer,this.id).lt(100)},
             cost(x){
                 let cost = n(x).div(2).plus(1).pow(2).floor()
                 return cost
@@ -913,7 +932,7 @@ addLayer("Ktr", {
                 return eff
             },
             buy(){
-                player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
+                if(!hasAchievement('Ain','Hkm-6')) player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
                 setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
             },
             style(){
@@ -924,7 +943,7 @@ addLayer("Ktr", {
         'Ktr-s-d2': {
             title() {return '<h3>[Ktr-s-d2] Orion arm<br>Lv.'+getBuyableAmount(this.layer,this.id)},
             tooltip() {return 'Add .2 to the base of ark effect.<br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: +"+format(this.effect())+"<br>Cost: "+formatWhole(this.cost())+" Ark fuel"},
-            canAfford() {return player.Ktr.fuel.gte(this.cost())},
+            canAfford() {return player.Ktr.fuel.gte(this.cost()) && getBuyableAmount(this.layer,this.id).lt(100)},
             cost(x){
                 let cost = n(x).div(1.2).plus(1).pow(2).floor()
                 return cost
@@ -935,7 +954,7 @@ addLayer("Ktr", {
                 return eff
             },
             buy(){
-                player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
+                if(!hasAchievement('Ain','Hkm-6')) player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
                 setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
             },
             style(){
@@ -946,7 +965,7 @@ addLayer("Ktr", {
         'Ktr-s-d3': {
             title() {return '<h3>[Ktr-s-d3] Centaurus arm<br>Lv.'+getBuyableAmount(this.layer,this.id)},
             tooltip() {return 'Each brown dwarf provide .03 extra red dwarf.<br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: +"+format(this.effect())+"<br>Cost: "+formatWhole(this.cost())+" Ark fuel"},
-            canAfford() {return player.Ktr.fuel.gte(this.cost())},
+            canAfford() {return player.Ktr.fuel.gte(this.cost()) && getBuyableAmount(this.layer,this.id).lt(100)},
             cost(x){
                 if(x<5) return n(x).mul(2).plus(1).pow(2).floor() 
 		        if(x==5) return new Decimal(1e9999)
@@ -957,7 +976,7 @@ addLayer("Ktr", {
                 return eff
             },
             buy(){
-                player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
+                if(!hasAchievement('Ain','Hkm-6')) player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
                 setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
             },
             style(){
@@ -968,7 +987,7 @@ addLayer("Ktr", {
         'Ktr-s-d4': {
             title() {return '<h3>[Ktr-s-d4] Andromeda Galaxy<br>Lv.'+getBuyableAmount(this.layer,this.id)},
             tooltip() {return 'Boost all resource gain in the tab [Remote Space].<br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: ×"+format(this.effect())+"<br>Cost: "+formatWhole(this.cost())+" Ark fuel"},
-            canAfford() {return player.Ktr.fuel.gte(this.cost())},
+            canAfford() {return player.Ktr.fuel.gte(this.cost()) && getBuyableAmount(this.layer,this.id).lt(100)},
             cost(x){
                 return n(x).mul(1.8).plus(1).pow(2).sub(player.Ktr.solarPower[3].gte(1)? tmp.Ktr.clickables['Ktr-r-c4'].effect1 : 0).floor().max(0)
             },
@@ -977,7 +996,7 @@ addLayer("Ktr", {
                 return Decimal.pow(n(1.5).add(tmp.Ktr.memoryLevel.gte(tmp.Ktr.memoryBonus[6].start)? 0.5 : 0),x)
             },
             buy(){
-                player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
+                if(!hasAchievement('Ain','Hkm-6')) player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
                 setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
             },
             style(){
@@ -988,7 +1007,7 @@ addLayer("Ktr", {
         'Ktr-s-d5': {
             title() {return '<h3>[Ktr-s-d5] NGC 2068<br>Lv.'+getBuyableAmount(this.layer,this.id)},
             tooltip() {return 'Boost solar energy gain.<br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: ×"+format(this.effect())+"<br>Cost: "+formatWhole(this.cost())+" Ark fuel"},
-            canAfford() {return player.Ktr.fuel.gte(this.cost())},
+            canAfford() {return player.Ktr.fuel.gte(this.cost()) && getBuyableAmount(this.layer,this.id).lt(100)},
             cost(x){
                 return n(x).mul(1.4).plus(1).pow(2).sub(player.Ktr.solarPower[3].gte(1)? tmp.Ktr.clickables['Ktr-r-c4'].effect1 : 0).floor().max(0)
             },
@@ -997,7 +1016,7 @@ addLayer("Ktr", {
                 return Decimal.pow(2,x)
             },
             buy(){
-                player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
+                if(!hasAchievement('Ain','Hkm-6')) player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
                 setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
             },
             style(){
@@ -1008,7 +1027,7 @@ addLayer("Ktr", {
         'Ktr-s-d6': {
             title() {return '<h3>[Ktr-s-d6] NGC 4486<br>Lv.'+getBuyableAmount(this.layer,this.id)},
             tooltip() {return 'Raise the effect of electroweak star to a power.<br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: ^"+format(this.effect())+"<br>Cost: "+formatWhole(this.cost())+" Ark fuel"},
-            canAfford() {return player.Ktr.fuel.gte(this.cost())},
+            canAfford() {return player.Ktr.fuel.gte(this.cost()) && getBuyableAmount(this.layer,this.id).lt(100)},
             cost(x){
                 return n(x).mul(1.8).plus(1).pow(2).floor()
             },
@@ -1017,7 +1036,7 @@ addLayer("Ktr", {
                 return Decimal.add(1,x.add(1).log(4))
             },
             buy(){
-                player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
+                if(!hasAchievement('Ain','Hkm-6')) player.Ktr.fuel = player.Ktr.fuel.sub(this.cost())
                 setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
             },
             style(){
@@ -1028,36 +1047,36 @@ addLayer("Ktr", {
         'Ktr-g-h1': {
             title() {return "<h3>[i] Sea of Mystery "+(this.enabled()? quickColor('(Stable)','green'):quickColor('(Disrupted)','red'))},
             display() {let dis = '<h2>[Kether] The ultimate beauty of truth is achieved through constantly overcoming oneself in every failure and reflection. If every time you enter the Heart Gate, the result is at least 7 times better than the previous one, I think you have achieved this.'
-        if(!this.enabled()) {if(player.Ktr.realTime.lt(300)) dis += '<br><br>'+quickColor('Reach 300s of reality time to discover more.','grey')
-        else dis += '<br><br>'+quickColor('Every time you exit the Heart Gate, you need to obtain at least 7 times the memory crystal obtained from the last exit for 3 times in a row to stabilize it.','red')}
-        else dis += '<br><br>'+quickColor('Memory Crystal gain rate ×20','green')
-        return dis
-        },
-            enabled() {return player.Ktr.gate1 >= 3},
+            if(!this.enabled()) {if(player.Ktr.realTime.lt(300)) dis += '<br><br>'+quickColor('Reach 300s of reality time to discover more.','grey')
+            else dis += '<br><br>'+quickColor('Every time you exit the Heart Gate, you need to obtain at least 7 times the memory crystal obtained from the last exit for 3 times in a row to stabilize it.','red')}
+            else dis += '<br><br>'+quickColor('Memory Crystal gain rate ×20','green')
+            return dis
+            },
+            enabled() {return this.unlocked() && (player.Ktr.gate1 >= 3 || hasMilestone('Hkm','Hkm-1'))},
             canAfford() {return false},
             unlocked() {return player.Ktr.storyUnlocked >= 9}
         },
         'Ktr-g-h2': {
             title() {return "<h3>[ii] Sea of Illusion "+(this.enabled()? quickColor('(Stable)','green'):quickColor('(Disrupted)','red'))},
             display() {let dis = '<h2>[Kether] The law of balance undoubtedly applies to all things in the interstellar world. You can deeply understand this in the fuel usage of the ark.'
-        if(!this.enabled()) {if(player.Ktr.realTime.lt(1000)) dis += '<br><br>'+quickColor('Reach 1000s of reality time to discover more.','black')
-        else dis += '<br><br>'+quickColor('Let all of your upgrades in remote space go beyond lv.6 ( Except for Ktr-s-d3, it only requires to go beyond lv.4) to stabilize it.','red')}
-        else dis += '<br><br>'+quickColor('Heart Gate nerf expontent +^0.05','green')
-        return dis
-        },
-            enabled() {return getBuyableAmount('Ktr','Ktr-s-d1').gte(7) && getBuyableAmount('Ktr','Ktr-s-d2').gte(7) && getBuyableAmount('Ktr','Ktr-s-d3').gte(5) && getBuyableAmount('Ktr','Ktr-s-d4').gte(7) && getBuyableAmount('Ktr','Ktr-s-d5').gte(7) && getBuyableAmount('Ktr','Ktr-s-d6').gte(7)},
+            if(!this.enabled()) {if(player.Ktr.realTime.lt(1000)) dis += '<br><br>'+quickColor('Reach 1000s of reality time to discover more.','black')
+            else dis += '<br><br>'+quickColor('Let all of your upgrades in remote space go beyond lv.6 ( Except for Ktr-s-d3, it only requires to go beyond lv.4) to stabilize it.','red')}
+            else dis += '<br><br>'+quickColor('Heart Gate nerf expontent +^0.05','green')
+            return dis
+            },
+            enabled() {return this.unlocked() && ((getBuyableAmount('Ktr','Ktr-s-d1').gte(7) && getBuyableAmount('Ktr','Ktr-s-d2').gte(7) && getBuyableAmount('Ktr','Ktr-s-d3').gte(5) && getBuyableAmount('Ktr','Ktr-s-d4').gte(7) && getBuyableAmount('Ktr','Ktr-s-d5').gte(7) && getBuyableAmount('Ktr','Ktr-s-d6').gte(7)) || hasMilestone('Hkm','Hkm-1') )},
             canAfford() {return false},
             unlocked() {return player.Ktr.storyUnlocked >= 9 && player.Ktr.memoryCrystal.gte(1e6)}
-        },
+         },
         'Ktr-g-h3': {
             title() {return "<h3>[iii] Sea of Dream "+(this.enabled()? quickColor('(Stable)','green'):quickColor('(Disrupted)','red'))},
             display() {let dis = '<h2>[Kether] All miracles in the universe are built on the right foundation of time. If you can freeze time around integer moments, then you have the potential to master the time of all things.'
-        if(!this.enabled()) {if(player.Ktr.realTime.lt(2000)) dis += '<br><br>'+quickColor('Reach 2000s of reality time to discover more.','black')
-        else dis += '<br><br>'+quickColor('Change timespan rate to x1/8 and wait until your universal time can be divisible by 60s(1min) to stabilize it.','red')}
-        else dis += '<br><br>'+quickColor('Heart Gate nerf expontent x2','green')
-        return dis
-        },
-            enabled() {return player.Ktr.universalTime.gte(30) && player.Ktr.universalTime.toNumber() % 60 <= 2 && player.Ktr.timeWrap < n(0.2)},
+            if(!this.enabled()) {if(player.Ktr.realTime.lt(2000)) dis += '<br><br>'+quickColor('Reach 2000s of reality time to discover more.','black')
+            else dis += '<br><br>'+quickColor('Change timespan rate to x1/8 and wait until your universal time can be divisible by 60s(1min) to stabilize it.','red')}
+            else dis += '<br><br>'+quickColor('Heart Gate nerf expontent x2','green')
+            return dis
+            },
+            enabled() {return this.unlocked() && ((player.Ktr.universalTime.gte(30) && player.Ktr.universalTime.toNumber() % 60 <= 2 && player.Ktr.timeWrap < n(0.2)) || hasMilestone('Hkm','Hkm-1'))},
             canAfford() {return false},
             unlocked() {return player.Ktr.storyUnlocked >= 9 && player.Ktr.memoryCrystal.gte(1e10)}
         },
@@ -1158,6 +1177,7 @@ addLayer("Ktr", {
         if(tmp.Ktr.memoryLevel.gte(tmp.Ktr.memoryBonus[1].start)) mult = mult.mul(tmp.Ktr.memoryBonus[1].effect)
         if(player.Ktr.ark.gte(1)) mult = mult.mul(tmp.Ktr.arkEff)
         if(mult.gte(1e100)) mult = softcap(mult,'root',n(1e100),1.8)
+        if(hasMilestone('Hkm','Hkm-1')) mult = mult.mul(tmp.Hkm.effect)
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -1179,6 +1199,7 @@ addLayer("Ktr", {
         return story
     },
     memoryLevel(){
+        if(hasMilestone('Hkm','Hkm-11')) return n(100)
         let memory = getBuyableAmount('Ktr','Ktr-m1').mul(25).add(getBuyableAmount('Ktr','Ktr-m2').mul(50)).add(getBuyableAmount('Ktr','Ktr-m3').mul(200))
         return memory.div(200).floor().min(100)
     },
@@ -1568,7 +1589,7 @@ addLayer("Ktr", {
                     ['display-text',function(){if(player.Ktr.storyUnlocked >= 9)return '<h4>You have collected a total of   '+quickBigColor(formatWhole(player.Ktr.memoryCrystal),'white') +' memory crystal. Itself boosts the effect of solar energy.(Uneffected by the nerf of heart gate)'}],
                     ['display-text',function(){if(player.Ktr.activeChallenge == 'Ktr-g1')return '<h4>Universal timespan: '+quickBigColor(formatTime(player.Ktr.universalTime),'white')}],
                     ['display-text',function(){if(player.Ktr.activeChallenge == 'Ktr-g1')return '<h4>Reality timespan: '+quickBigColor(formatTime(player.Ktr.realTime),'white')+', translated to a stallar nerf of '+quickBigColor('^'+format(tmp.Ktr.gateEff),'white')}],
-                    ['display-text',function(){if(player.Ktr.activeChallenge == 'Ktr-g1')return '<h4>You have '+quickBigColor(formatWhole(tmp.Ktr.antimatter),'white')+' antimetter.'}],
+                    ['display-text',function(){if(player.Ktr.activeChallenge == 'Ktr-g1')return '<h4>You have '+quickBigColor(formatWhole(tmp.Ktr.antimatter),'white')+' antimatter.'}],
                     "blank",
                     ['row',[['challenge','Ktr-g1'],["column", [["raw-html", function() {}],
                     "blank",['display-text',function(){return '<h3>[Black Hole controller]<br>Change the stallar and universal timespan rate.'}],
@@ -1600,13 +1621,43 @@ addLayer("Ktr", {
         if(tmp.Ktr.storyPending > player[this.layer].storyUnlocked) {
             player[this.layer].storyUnlocked = tmp.Ktr.storyPending;
             player[this.layer].newStory = true
-            doPopup(type = "none", text = "New Kether story unlocked!<br>(No. "+formatWhole(player[this.layer].storyUnlocked)+")", title = "Ancient Universal Memory Awaken...", timer = 5, color = "white")
+            if(!hasMilestone('Hkm','Hkm-9')) doPopup(type = "none", text = "New Kether story unlocked!<br>(No. "+formatWhole(player[this.layer].storyUnlocked)+")", title = "Ancient Universal Memory Awaken...", timer = 5, color = "white")
         }
-        if(getBuyableAmount('Ktr','Ktr-s5').gte(1)) player.Ktr.stallar = player.Ktr.stallar.add((player.Ktr.activeChallenge == 'Ktr-g1'? n(0) : buyableEffect('Ktr','Ktr-s5')).mul(tmp.Ktr.clickables['Ktr-s1'].gain).mul(diff))
+        if(getBuyableAmount('Ktr','Ktr-s5').gte(1) || hasMilestone('Hkm','Hkm-1')) player.Ktr.stallar = player.Ktr.stallar.add((player.Ktr.activeChallenge == 'Ktr-g1'? n(0) : buyableEffect('Ktr','Ktr-s5')).mul(tmp.Ktr.clickables['Ktr-s1'].gain).mul(diff))
         if(player.Ktr.activeChallenge == 'Ktr-g1'){
-            player.Ktr.realTime = player.Ktr.realTime.add(diff)
+            player.Ktr.realTime = player.Ktr.realTime.add(n(diff).mul(player.Hkm.unlocked? tmp.Hkm.effect : 1))
             player.Ktr.universalTime = player.Ktr.universalTime.add(n(diff).mul(player.Ktr.timeWrap))
         }
+        if(hasMilestone('Hkm','Hkm-1')){
+            for(var i = 1; i <= 6; i++){
+                if(layers.Ktr.buyables['Ktr-s'+i].unlocked) buyBuyable('Ktr','Ktr-s'+i)
+            }
+        }
+        if(hasAchievement('Ain','Hkm-5') && player.Ktr.remote){
+            for(var i = 1; i <= 5; i++){
+                if(tmp.Ktr.celestialPerSec[i-1].gte(1) && tmp.Ktr.clickables['Ktr-r-c'+i].unlocked) player.Ktr.solarPower[i-1] = player.Ktr.solarPower[i-1].add(layers.Ktr.celestialGain()[i-1].mul(diff).mul(10))
+            }
+        }
+        if(hasMilestone('Hkm','Hkm-3')){
+            if(player.Ktr.stallar.gte(tmp.Ktr.arkFullReq)){
+                player.Ktr.ark = player.Ktr.ark.add(1)
+                player.Ktr.fuel = player.Ktr.fuel.add(player.Ktr.ark)
+                player.Ktr.totalFuel = player.Ktr.totalFuel.add(player.Ktr.ark)
+                if(player.Ktr.ark.lt(21)) for(var i = 1; i <= 6; i++){
+                    setBuyableAmount('Ktr','Ktr-s'+i,n(0))
+                }
+                player.Ktr.stallar = n(0)
+            }
+        }
+        if(hasMilestone('Hkm','Hkm-4')){
+            buyBuyable('Ktr','Ktr-m1')
+            buyBuyable('Ktr','Ktr-m2')
+            buyBuyable('Ktr','Ktr-m3')
+        }
+        if(hasMilestone('Hkm','Hkm-5') && player.Ktr.stallar.gte(tmp.Ktr.solarReq[player.Ktr.solarLayer])) player.Ktr.solarLayer++
+        if(hasMilestone('Hkm','Hkm-6')) player.Ktr.timeWrap = n(1000)
+        if(hasMilestone('Hkm','Hkm-9')) {buyBuyable('Ktr','Ktr-s-d2'),buyBuyable('Ktr','Ktr-s-d3')}
+        if(hasMilestone('Hkm','Hkm-10')) {buyBuyable('Ktr','Ktr-s-d1'),buyBuyable('Ktr','Ktr-s-d4'),buyBuyable('Ktr','Ktr-s-d5'),buyBuyable('Ktr','Ktr-s-d6')}
     },
 })
 addLayer("Hkm", {
@@ -1614,31 +1665,274 @@ addLayer("Hkm", {
         unlocked: true,                     // You can add more variables here to add them to your layer.
         points: new Decimal(0),
         storyUnlocked: 0,
-        newStory: false,             // "points" is the internal name for the main resource of the layer.
+        storyShowing: 1,
+        newStory: false,
+        resetTimes: 0,             // "points" is the internal name for the main resource of the layer.
     }},
     symbol(){return "Hkm<sup>"+player.Hkm.storyUnlocked},
     color: "grey",                       // The color for this layer, which affects many elements.
     resource: "hokma points",            // The name of this layer's main prestige resource.
     row: 1,                                 // The row this layer is on (0 is the first row).
+    passiveGeneration(){return hasAchievement('Ain','Hkm-7')? 10 : 0},
+    baseResource: "kether points",                 // The name of the resource your prestige gain is based on.
+    baseAmount() { return player.Ktr.points },  // A function to return the current amount of baseResource.
 
-    baseResource: "points",                 // The name of the resource your prestige gain is based on.
-    baseAmount() { return player.points },  // A function to return the current amount of baseResource.
-
-    requires: new Decimal(9e9999),              // The amount of the base needed to  gain 1 of the prestige currency.
+    requires: new Decimal(1e200),              // The amount of the base needed to  gain 1 of the prestige currency.
                                             // Also the amount required to unlock the layer.
 
     type: "normal",                         // Determines the formula used for calculating prestige currency.
-    exponent: 0.5,
-    branches: ['Ktr'],                          // "normal" prestige gain is (currency^exponent).
+    exponent: 1e-300,
+    branches: ['Ktr'],
+    resetsNothing() {return false},                          // "normal" prestige gain is (currency^exponent).
 
     gainMult() {                            // Returns your multiplier to your gain of the prestige resource.
-        return new Decimal(1)               // Factor in any bonuses multiplying gain here.
+        let mult = new Decimal(1)
+        if(hasAchievement('Ain','Hkm-3')) {
+            bonus = Decimal.pow(2,player.Ktr.ark.sub(46)).max(1)
+            if(bonus.gte(10)) bonus = softcap(bonus,'root',n(10),5)
+            mult = mult.mul(bonus)
+        }
+        if(hasAchievement('Ain','Hkm-2')) mult = mult.mul(n(15).div(player.Ain.bestReset).add(1).min(30))
+        return mult              // Factor in any bonuses multiplying gain here.
+    },
+    effect(){
+        if(!hasMilestone('Hkm','Hkm-1')) return n(1)
+        let eff = n(2).mul(player.Hkm.points.sqrt())
+        if(hasMilestone('Hkm','Hkm-1')) eff = eff.mul(tmp.Ain.effect)
+        return eff
+    },
+    effectDescription(){
+        return "boosting your essence gain, kether points gain and stallar gain by " + quickBigColor(' ×'+format(tmp.Hkm.effect),'grey')
     },
     gainExp() {                             // Returns the exponent to your gain of the prestige resource.
         return new Decimal(1)
     },
+    canReset(){
+        return player.Ktr.memoryCrystal.gte(1e20) && player.Ktr.stallar.gte('1e330')
+    },
+    storyPending() {
+        let story = 0;
+        if(player.Hkm.points.gte(1)) story = 1;
+        if(player.Ain.achievements.length >= 7 && player.Hkm.storyUnlocked >= 1) story = 2;
+        return story
+    },
+    update(diff){
+        if(tmp.Hkm.storyPending > player[this.layer].storyUnlocked) {
+            player[this.layer].storyUnlocked = tmp.Hkm.storyPending;
+            player[this.layer].newStory = true
+            doPopup(type = "none", text = "New Hokma story unlocked!<br>(No. "+formatWhole(player[this.layer].storyUnlocked)+")", title = "The gears of time quietly rotate...", timer = 5, color = "gray")
+        }
+    },
+    storyContent: {
+        1:{
+            text(){ 
+                let text = `<text style='color:gray; font-size: 30px; text-shadow: 2px 2px 7px gray'>When the meteor falls, the star feathers stop and fall in the lake.</text><br>
+                <text style='color:gray; font-size: 30px; text-shadow: 2px 2px 7px gray'>I have never hated the seemingly approachable starry sky, the sinking illusion, like the meteor that people eagerly hope for. The meteor will not come, and my tomorrow is a deep darkness.——Hokma</text><br><br>
+        		<text style='color: #999999'>[Illustration] Ain had a dream about Kether, in which she mentioned that she had buried a key in Wonderland.</text><br>
+		        <text style='color: #999999'>[Illustration] When Ain woke up from her dream, she and I were riding on a wooden boat on the lake. I asked Ain where to go first, and Ain said that the clues provided by Ktr-2 pointed to Starfeather Town in the Kingdom of Niniel.</text><br>`
+                if(player.Hkm.storyUnlocked < 1) text += `<br><br>
+                <i style='color: #444444'>[Locked] Reach 1 hokma point to continue.(Tips: Press the prestige button in the hokma layer to gain kether points. The requirement is 1e20 memory crystals and 1e330 stallar points. You will LOSE ALL PROGRESS IN THE KETHER LAYER!!)</i>`
+                if(player.Hkm.storyUnlocked >= 1) text += `
+                <text style='color: #999999'>[Illustration] On the way by boat, the girl rowing the boat chatted with Ain, introducing that the Kingdom of Niniel is a romantic fantasy land woven from fairy tales, and each city is a place where Niniel's different fairy tales take place. Ain was curious about the fairy tale of Star Feather Town, and the boating girl replied that it was a Star Feather Swan.</text><br>
+                <text style='color:magenta'>[Ain] Legend has it that Silver Moon Lake is a mirror left by the great designer Kether in the forest, which can reflect the beautiful starry sky. The true beauty is that it can summon a grand meteor shower, and the wishes made under the meteor shower will definitely come true.</text><br>
+                <text style='color: #777777'>[Hokma-46] Come on, girl, come to Silver Moon Lake. Ripples are the stage, starry nights are the curtain~Dance, spread your wings, dreams come true, please let me accompany you~When swans dance, their wings fall into shooting stars...</text><br>
+                <text style='color:magenta'>[Ain] Oh, may this be related to the design brochure that Kether-2 gave us?</text><br>
+                `
+                return text
+            }
+        },
+        2:{
+            text(){ 
+                let text = `
+                <text style='color: #999999'>[Illustration] There is a rule in the design brochure that if creating a set of records, it requires the designer's inspiration to echo. Now Ain has the design inspiration for "Meteor Feather" in the album. You suggest going to the design workshop in Star Feather Town to make it. Hokma-46, a boat girl, took Ain to the shore with you and introduced her name as Ah Huan. Welcome to Star Feather Town in the future and take her boat frequently.</text><br>
+                <text style='color: #999999'>[Illustration] In the design workshop, Ain held the newly made bag and longed for the power of the Sephirah Shadow summoned after the design drawings of Meteor Feather were completed. He also longed to create more design drawings in the future and have stronger Sephirah power.</text><br>
+                `
+                if(player.Hkm.storyUnlocked < 2) text += `<br><br>
+                <i style='color: #444444'>[Locked] Unlock at least 7 achievements to continue. The more milestones you have, the faster the next Hokma run will be.</i>`
+                if(player.Hkm.storyUnlocked >= 2) text += `
+                <text style='color: #999999'>[Illustration] Ain was pulling out his wallet to pay for the production fee when a handsome young man in gorgeous attire approached the shop owner. He made a delicate glove, but the shop owner offered it for free. The young man repeatedly thanked him, but Ain was very puzzled as to why it was free and whether there were any activities?</text><br>
+                <text style='color: #999999'>[Illustration] The handsome young man blinked at Ain and left. The shop owner explained to Ain that beauty is everything in Star Feather Town, and as a member of Star Feather Town, it is natural to give preferential treatment to beautiful people. Ain found this approach unbelievable. The shop owner said that people always think that Star Feather Town is a town that places too much emphasis on beauty, and there is no need to reject human nature. Instead, it is better to give more happiness to beautiful people like Star Feather Town, as unattractive people are not suitable to be born in Star Feather Town.</text><br>
+                <text style='color:magenta'>[Ain] Absurdly absurd, treating people differently based on their appearance?</text><br>
+                <text style='color: #999999'>[Illustration] Ain said that no one has a way to determine their natural beauty or ugliness. The shop owner An An said that you are already very beautiful and there is no need to underestimate yourself. Ain knew the shopkeeper had misunderstood him and explained that the evaluation system of Star Feather Town was just unreasonable.</text><br>
+                <text style='color: #999999'>[Illustration] Ain, who walked out of the store, looked at the fairy tale like street view of Feather Town again and had a different feeling. She found that the people walking on the street were all very beautiful. In the Feather Town of the Stars, beauty is everything. So, where have people who are not good-looking gone?</text><br>
+                `
+                return text
+            }
+        },
+        3:{
+            text(){ 
+                let text = `
+                <text style='color: #999999'>[Illustration] Perhaps in the eyes of outsiders, Star Feather Town is pleasing and beautiful, but it makes Ain feel uncomfortable.</text><br>
+                <text style='color: #999999'>[Illustration] Thinking of coming to Star Feather Town to find clues about Kether, Ain decided to first search for news about the nursery rhyme sung by Ah Huan. As for the clues about this nursery rhyme, the people in the town coincidentally mentioned a person - an old fairy tale musician who lived in the town hospital for two years.</text><br>
+                <text style='color: #999999'>[Illustration] Ain arrived outside the old musician's ward, and before Ain could knock on the door, the old musician's voice had already come from inside.</text><br>
+                <text style='color: #777777'>[Hokma-3] Are you Hokma-9? Come in, please.</text><br>
+                `
+                if(player.Hkm.storyUnlocked < 3) text += `<br><br>
+                <i style='color: #444444'>[Locked] Congratulations! You reached the end point of current version.</i>`
+                return text
+            }
+        },
+        4:{
+            text(){ 
+                let text = ``
+                return text
+            }
+        },
+        5:{
+            text(){ 
+                let text = ``
+                return text
+            }
+        },
+        6:{
+            text(){ 
+                let text = ``
+                return text
+            }
+        },
+        7:{
+            text(){ 
+                let text = ``
+                return text
+            }
+        },
+    },
+    milestones: {
+        'Hkm-1': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Autobuy every basic stars when affordable and gain 1 extra yellow dwarf.<br>2.All memory channels are always stable after unlocking them.<br>`+quickColor("3.Unlock Ain (Achievements).",'red')},
+            req: n(1),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return true}
+        },
+        'Hkm-2': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Keep all Kether upgrades on Hokma reset.`},
+            req: n(2),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-'+Number(this.id[4]-1))}
+        },
+        'Hkm-3': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Autobuy ark if possible.`},
+            req: n(3),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-'+Number(this.id[4]-1))}
+        },
+        'Hkm-4': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Autobuy things in Moments Watch Shop and they costs nothing.`},
+            req: n(4),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-'+Number(this.id[4]-1))}
+        },
+        'Hkm-5': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Auto Transition when possible.`},
+            req: n(6),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-'+Number(this.id[4]-1))}
+        },
+        'Hkm-6': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.The black hole speed is always at 1000× and you cannot longer gain antimatter.`},
+            req: n(9),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-'+Number(this.id[4]-1))}
+        },
+        'Hkm-7': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Keep memory crystal through Hokma reset.`},
+            req: n(18),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-'+Number(this.id[4]-1))}
+        },
+        'Hkm-8': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.The ark is in remote space instantly after Hokma reset.`},
+            req: n(100),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-'+Number(this.id[4]-1))}
+        },
+        'Hkm-9': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Autobuy Ktr-s-d2 and Ktr-s-d3.<br>2.Unlocking new Kether story won’t longer force a pupop.`},
+            req: n(500),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-'+Number(this.id[4]-1))}
+        },
+        'Hkm-10': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Autobuy the rest of buyables.`},
+            req: n(1000),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-9')}
+        },
+        'Hkm-11': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.The memory dipth of Kether is always 100.`},
+            req: n(2500),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-1'+Number(this.id[5]-1))}
+        },
+        'Hkm-12': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Keep all buyable and arks after Hokma reset.`},
+            req: n(5000),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-1'+Number(this.id[5]-1))}
+        },
+    },
 
-    layerShown() { return player.Ktr.memoryCrystal.gte(1e20) },          // Returns a bool for if this layer's node should be visible in the tree.
+    layerShown() { return player.Ktr.memoryCrystal.gte(1e20) || player.Hkm.storyUnlocked >= 1 },          // Returns a bool for if this layer's node should be visible in the tree.
 
     upgrades: {
         // Look in the upgrades docs to see what goes here!
@@ -1646,9 +1940,10 @@ addLayer("Hkm", {
     tabFormat:{
         'Time Machine':{
             content:[
-                // ['display-text','<button class="info Hokma" onClick="ketherStory()">Story</button>'],
                 'main-display',
-                'prestige-button'
+                'prestige-button',
+                'blank',
+                'milestones',
             ]
         }
     }
@@ -1713,4 +2008,193 @@ function ketherStory(){
 			},
 		}
 	})
+}
+
+function hokmaStory(){
+    player.Hkm.newStory = false
+    Modal.show({
+		color: 'gray',
+		title() {return `<text style='color:gray'>Hokma's Quotes > Story `+player.Hkm.storyShowing+`</text>`},
+		text() {return tmp.Hkm.storyContent[player.Hkm.storyShowing].text},
+		buttons:{
+			1:{
+				text:`Story 01`,
+                onClick(){
+                    player.Hkm.storyShowing = 1
+                },
+                unlocked(){return true}
+			},
+            2:{
+				text:`02`,
+                onClick(){
+                    player.Hkm.storyShowing = 2
+                },
+                unlocked(){return player.Hkm.storyUnlocked >= 1}
+			},
+            3:{
+				text:`03`,
+                onClick(){
+                    player.Hkm.storyShowing = 3
+                },
+                unlocked(){return player.Hkm.storyUnlocked >= 2}
+			},
+            4:{
+				text:`04`,
+                onClick(){
+                    player.Hkm.storyShowing = 4
+                },
+                unlocked(){return false}
+			},
+            5:{
+				text:`05`,
+                onClick(){
+                    player.Hkm.storyShowing = 5
+                },
+                unlocked(){return false}
+			},
+            6:{
+				text:`06`,
+                onClick(){
+                    player.Hkm.storyShowing = 6
+                },
+                unlocked(){return false}
+			},
+            7:{
+				text:`07`,
+                onClick(){
+                    player.Hkm.storyShowing = 7
+                },
+                unlocked(){return false}
+			},
+		}
+	})
+}
+addLayer("Ain", {
+    name: "Ain", // This is optional, only used in a few places, If absent it just uses the layer id.
+    position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
+    startData() { return {
+        unlocked: true,
+		points: new Decimal(0),
+        feature: 0,
+        hkm4unlocked: false,
+        hkm5unlocked: false,
+        hkm6unlocked: false,
+        bestReset: 999999,
+    }},
+    color: "pink",
+    resource: "ain points",
+    symbol(){return "Ain<sup>"+player.Ain.achievements.length},
+    effect() {
+        return Decimal.pow(n(2),player.Ain.points)
+    },
+    effectDescription() {
+        return "Boosts Hokma's effect by "+quickBigColor(format(tmp.Ain.effect.mul(100))+"%","pink")
+    },
+    nodeStyle(){
+        return {
+            "border-color":"pink",
+            "border-width":"3px",
+            "background": "linear-gradient(135deg,pink 6%, white 99%)",
+            "height": "70px",
+            "width": "70px",
+			"border-radius": "5px"
+        }
+    },
+    achievements: {
+        'Hkm-1':{
+            name() {return "dB doll"},
+            tooltip() { return 'Get a 2nd Hokma point.(+1 AP)'},
+            done() { return hasMilestone('Hkm','Hkm-1') && player.Hkm.points.gte(2)}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(1)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-2':{
+            name() {return "bid farewell to the outgoing year"},
+            tooltip() { return 'Stay in Heart gate for a whole day.(Reality Time) +1 AP, best reset time of Hokma boosts itself gain.<br>Currently: ×'+format(n(15).div(player.Ain.bestReset).add(1).min(30))},
+            done() { return hasMilestone('Hkm','Hkm-1') && player.Ktr.realTime.gte(86400)}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(1)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-3':{
+            name() {return "mopemope"},
+            tooltip() { return 'Have 48 arks. (+1 AP, each ark after 46 multiplys hokma points gain by 2×.)'},
+            done() { return hasMilestone('Hkm','Hkm-1') && player.Ktr.ark.gte(48)}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(1)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-4':{
+            name() {return "Initialie"},
+            tooltip() { return 'Do a hokma reset without reseting Kether‘s memory. (+1 AP, Bonus: Kether’s memory no longer have negative effects.)'},
+            done() { return hasMilestone('Hkm','Hkm-1') && player.Ain.hkm4unlocked}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(1)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-5':{
+            name() {return "Dash"},
+            tooltip() { return 'Do a hokma reset with at least one resource in Remote space is at lv0. (+1 AP, Bonus: Get 100% resource on hold when they’re getting >1%/s normally.)'},
+            done() { return hasMilestone('Hkm','Hkm-1') && player.Ain.hkm5unlocked}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(1)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-6':{
+            name() {return "Demiurge"},
+            tooltip() { return 'Do a hokma reset without respecing distant space upgrades. (+1 AP, Bonus: All distant upgrades costs nothing.)'},
+            done() { return hasMilestone('Hkm','Hkm-1') && player.Ain.hkm6unlocked}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(1)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-7':{
+            name() {return "Arkhei"},
+            tooltip() { return 'Do a hokma reset within 200ms. (+1 AP, Bonus: Gain 1000% Hokma points on reset per second.)'},
+            done() { return hasMilestone('Hkm','Hkm-1') && player.Ain.bestReset <= 0.2}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(1)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+    },
+    row: 'side', // Row the layer is in on the tree (0 is the first row)
+    layerShown(){return hasMilestone('Hkm','Hkm-1')},
+    tabFormat:{
+        "Achievements":{
+                content:[
+                    "main-display",
+                    "blank",
+                    ["column", [["raw-html", function() {}],
+                     "blank",['display-text',function(){return '<h3>[Stage 2-1] First Encounter of Star Feather Town<br>Unlock all achievement in this row to unlock Time Compressor (in Hokma layer but coming soon).'}],
+                    ['row',[["achievement",'Hkm-1'],["achievement",'Hkm-2'],["achievement",'Hkm-3'],["achievement",'Hkm-4'],["achievement",'Hkm-5'],["achievement",'Hkm-6'],["achievement",'Hkm-7']]],
+                    "blank",
+                    ],
+                    {
+                        "color":"black",
+                        "width":"700px",
+                        "border-color":"#FFFFFF",
+                        "border-width":"3px",
+                        "background-color":"#AAAAAA",
+                    }],
+                ],
+                buttonStyle() {return {"color":"#FFFFFF",
+                "border-radius":"5px",
+                "border-color":"#FFFFFF",
+                "border-width":"2px",
+                "background":"#000000",
+                "background-image":
+                "linear-gradient(#000 15px,transparent 0),linear-gradient(90deg,white 1px,transparent 0)",
+                "background-size":"16px 16px,16px 16px",
+                "box-shadow":"2px 2px 2px white"
+                }}
+            },
+        },
+})
+
+function onReset(layer){
+    if(layer == 'Hkm' && player.Hkm.resetTime < player.Ain.bestReset) player.Ain.bestReset = player.Hkm.resetTime
+    if(layer == 'Hkm' && player.Ktr.resetedMemory == false) player.Ain.hkm4unlocked = true
+    if(layer == 'Hkm' && player.Ktr.respeced == false) player.Ain.hkm6unlocked = true
+    if(layer == 'Hkm' && (tmp.Ktr.celestialLevel[0].lt(1)||tmp.Ktr.celestialLevel[1].lt(1)||tmp.Ktr.celestialLevel[2].lt(1)||tmp.Ktr.celestialLevel[3].lt(1)||tmp.Ktr.celestialLevel[4].lt(1))) player.Ain.hkm5unlocked = true
 }

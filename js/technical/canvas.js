@@ -73,16 +73,24 @@ function drawTreeBranch(num1, data, prefix) { // taken from Antimatter Dimension
 	if (document.getElementById(num1) == null || document.getElementById(num2) == null)
 		return
 
-	let start = document.getElementById(num1).getBoundingClientRect();
-    let end = document.getElementById(num2).getBoundingClientRect();
-    let x1 = start.left + (start.width / 2) + document.body.scrollLeft;
-    let y1 = start.top + (start.height / 2) + document.body.scrollTop;
-    let x2 = end.left + (end.width / 2) + document.body.scrollLeft;
-    let y2 = end.top + (end.height / 2) + document.body.scrollTop;
-    ctx.lineWidth = width;
-    ctx.beginPath();
-    ctx.strokeStyle = color_id
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
+		let start = document.getElementById(num1).getBoundingClientRect();
+		let end = document.getElementById(num2).getBoundingClientRect();
+		let x1 = start.left + (start.width / 2) + document.body.scrollLeft;
+		let y1 = start.top + (start.height / 2) + document.body.scrollTop;
+		let x2 = end.left + (end.width / 2) + document.body.scrollLeft;
+		let y2 = end.top + (end.height / 2) + document.body.scrollTop;
+		ctx.lineWidth = width;
+		ctx.beginPath();
+		ctx.strokeStyle = color_id
+		ctx.moveTo(x1, y1);
+		ctx.lineTo(x2, y2);
+		ctx.stroke();
+		ctx.strokeStyle = 'gray';
+		for (var i = 0; i <= 6; i++) {
+			ctx.beginPath();
+			ctx.moveTo((x1+(i/16+0.1*i-player.timePlayed%0.2)*(x2-x1)), (y1+(i/16+0.1*i-player.timePlayed%0.2)*(y2-y1)));
+			ctx.lineTo((x1+((i+1)/16+0.1*i-player.timePlayed%0.2)*(x2-x1)), (y1+((i+1)/16+0.1*i-player.timePlayed%0.2)*(y2-y1)));
+			ctx.stroke();
+			ctx.closePath();
+		}
 }

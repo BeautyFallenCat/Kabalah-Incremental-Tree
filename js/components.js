@@ -224,7 +224,7 @@ function loadVue() {
 		template: `
 		<button v-if="(tmp[layer].type !== 'none')" v-bind:class="{ [layer]: true, reset: true, locked: !tmp[layer].canReset, can: tmp[layer].canReset}"
 			v-bind:style="[tmp[layer].canReset ? {'background-color': '#000000'} : {'background-color': ''},tmp[layer].canReset ? {'box-shadow': 'inset 0px 0px 10px '+(player.timePlayed%5+10)+'px ' +tmp[layer].color} : {'box-shadow':''},tmp[layer].canReset ? {'color':'white'} : {'color':'black'},tmp[layer].canReset ? {'border-color':tmp[layer].color} : {'border-color':''}, tmp[layer].componentStyles['prestige-button']]"
-			v-html="prestigeButtonText(layer)" v-on:click="doReset(layer)">
+			v-html="prestigeButtonText(layer)" v-on:click="onReset(layer),doReset(layer)">
 		</button><br>
 		`
 	
@@ -235,7 +235,7 @@ function loadVue() {
 		props: ['layer', 'data'],
 		template: `
 		<div><span v-if="player[layer].points.lt('1e1000')">You have </span><h2 v-bind:style="{'color': tmp[layer].color, 'text-shadow': '0px 0px 10px ' + tmp[layer].color}">{{data ? format(player[layer].points, data) : formatWhole(player[layer].points)}}</h2> {{tmp[layer].resource}}<span v-if="layers[layer].effectDescription">, <span v-html="run(layers[layer].effectDescription, layers[layer])"></span></span><br><br></div>
-		</span><info-thing:layer="layer"></info-thing><br><br></div>
+		</span><br><br></div>
 		`
 	})
 
@@ -598,6 +598,10 @@ function loadVue() {
 		props: ['layer'],
 		template: `<button class="info kether" @click="ketherStory()">Story {{player.Ktr.newStory?"(New!!)":""}}</button>`
 	})
+	Vue.component('info-thingb', {
+		props: ['layer'],
+		template: `<button class="info hokma" @click="hokmaStory()">Story {{player.Hkm.newStory?"(New!!)":""}}</button>`
+	})
 
 	// SYSTEM COMPONENTS
 	Vue.component('node-mark', systemComponents['node-mark'])
@@ -804,7 +808,7 @@ var texts =
     [
 		"0''''1''''2''''3''''3.5''''4''''4.4''''4.7''''5 Here is a ruler but SOFTCAPPED",
         "Hello world",
-        "Why can't you reach next sephirah? Because the ranking of last sephirah haven't Reach S",
+        "Why can't you reach next sephirah? Because the ranking of last sephirah haven't reach S (920,000 pts).",
         "See You Next Time",
         "Let's get HIGHER!",
         "72788433374733678633778263464",
@@ -827,7 +831,11 @@ var texts =
 		"The instability of Fallen_Cat's Method is 100-e^ipi%. If this number go beyond 100%, the game will be broken.",
 		"F1.8e308 is the limit of game number, not the limit of Fallen_Cat's idea.",
 		"Breaking news! A Memory Crystal mine is collapsed and 114 miners lost their lives.",
-		"Legend has it that within the delicate and fragile butterfly body, there is also the power to trigger hurricanes. This butterfly, composed of pure wind, is undoubtedly waiting for the day when another storm is summoned"
+		"Legend has it that within the delicate and fragile butterfly body, there is also the power to trigger hurricanes. This butterfly, composed of pure wind, is undoubtedly waiting for the day when another storm is summoned",
+		"KarbalOS is loading",
+		"Playing click games for a long time can pose a risk of tenosynovitis. Pay attention to rest.",
+		"After playing for a long time, remember to close your eyes and rest for a while~",
+		"As is well known, the author's year has 377 days",
     ]
 var p = 50 + (document.body.clientWidth / 2.4)
 var l = -50 - (newsText.innerText.length * 20)

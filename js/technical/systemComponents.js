@@ -93,7 +93,7 @@ var systemComponents = {
 			</div>
 			<div v-else>
 				<div class="upgTable" v-bind:style="{'padding-top': (embedded ? '0' : '25px'), 'margin-top': (embedded ? '-10px' : '0'), 'margin-bottom': '24px'}">
-				    <info-thing v-bind:class="player.Ktr.newStory ? 'new':''"></info-thing>
+				    <info-thing v-bind:class="player.Ktr.newStory ? 'new':''" v-if='layer == "Ktr"'></info-thing><info-thingb v-bind:class="player.Hkm.newStory ? 'new':''" v-if='layer == "Hkm"'></info-thingb>
 					<tab-buttons v-bind:style="tmp[layer].componentStyles['tab-buttons']" :layer="layer" :data="tmp[layer].tabFormat" :name="'mainTabs'"></tab-buttons>
 				</div>
 				<layer-tab v-if="tmp[layer].tabFormat[player.subtabs[layer].mainTabs].embedLayer" :layer="tmp[layer].tabFormat[player.subtabs[layer].mainTabs].embedLayer" :embedded="true" :key="this.$vnode.key + '-' + layer"></layer-tab>
@@ -114,7 +114,7 @@ var systemComponents = {
 		</span>
 		<br>
 		<span v-if="player.points.lt('1e1000')"  class="overlayThing">You have </span>
-		<h2  class="overlayThing" id="points">{{format(player.points)}}</h2>
+		<h2  class="overlayThing" id="points" v-bind:style='{color: pointsColor(),"text-shadow":pointsColor()+" 0px 0px 10px"}'>{{format(player.points)}}</h2>
 		<span v-if="player.points.lt('1e1e6')"  class="overlayThing"> {{modInfo.pointsName}}</span>
 		<br>
 		<span v-if="canGenPoints()"  class="overlayThing">({{tmp.other.oompsMag != 0 ? format(tmp.other.oomps) + " OOM" + (tmp.other.oompsMag < 0 ? "^OOM" : tmp.other.oompsMag > 1 ? "^" + tmp.other.oompsMag : "") + "s" : formatSmall(getPointGen())}}/sec)</span>
@@ -219,3 +219,7 @@ var systemComponents = {
 
 }
 
+function pointsColor(){
+	if(player.points.lt(1e200)) return 'white'
+	else return 'grey'
+}
