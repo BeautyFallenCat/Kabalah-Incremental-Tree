@@ -422,3 +422,16 @@ function softcap(name,type,start,power)
     }
     return name
 }
+var HokmaGridDesc = []
+var HokmaGridC = []
+HokmaGridC[101] = 6
+HokmaGridC[102] = 8
+HokmaGridC[201] = 10
+HokmaGridC[202] = 12
+HokmaGridDesc[101] = 'Ton-618 Black Hole boosts Hokma points gain.'
+HokmaGridDesc[102] = 'Preon Stars boosts Hokma’s Effect.'
+HokmaGridDesc[201] = 'Electroweak Stars boosts Hokma points gain.'
+HokmaGridDesc[202] = 'Neutron Stars boosts Hokma’s Effect.'
+var HokmaGridProfix = [null,'Hp','He']
+var HokmaGridFullProfix = [null,'Hokma_Points_','Hokma_Effect_']
+var HokmaColor = [null,'#444444','#555555']
