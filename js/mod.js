@@ -13,7 +13,7 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "Hkm.Hg.5",
+	num: "Hkm.Hg.6",
 	name: "Literally nothing",
 }
 
@@ -48,6 +48,7 @@ function getPointGen() {
 	if(player.Ktr.ark.gte(1)) gain = gain.mul(tmp.Ktr.arkEff)
 	if(hasMilestone('Hkm','Hkm-1')) gain = gain.mul(tmp.Hkm.effect)
 	if(hasUpgrade('Hkm','Hkm-4')) gain = gain.mul(1e50)
+	if(player.Hkm.storyUnlocked >= 6) gain = gain.mul(tmp.Hkm.foemEff1)
 	return gain
 }
 
@@ -214,7 +215,7 @@ var displayThings = [
 			return "<text style='color:grey'>[2nd Hokma Dimension] If you write 2 numbers per second, write down your essence amount will need " + formatTime(player.points.add(1).log10().div(2)) + ". During this period, the author has already completed " + format(player.points.add(1).log10().div(2).div(60).div(3.75).mul(100)) + "% of 800m run."
 	}, function() {
 		if ((player.points.add(1).log10().gte(494)) && (player.points.add(1).log10().lt(14400)))
-			return "<text style='color:grey'>[3rd Hokma Dimension] If you write 2 numbers per second, write down your essence amount will need " + formatTime(player.points.add(1).log10().div(2)) + ". During this period, a subject of an average SAT exam is completed " + format(player.points.add(1).log10().div(2).div(3600).div(72).mul(100)) + "%."
+			return "<text style='color:grey'>[3rd Hokma Dimension] If you write 2 numbers per second, write down your essence amount will need " + formatTime(player.points.add(1).log10().div(2)) + ". During this period, a subject of an average SAT exam is completed " + format(player.points.add(1).log10().div(2).div(200).div(72).mul(100)) + "%."
 	},
 ]
 

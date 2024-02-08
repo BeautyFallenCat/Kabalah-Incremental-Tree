@@ -223,3 +223,14 @@ function pointsColor(){
 	if(player.points.lt(1e200)) return 'white'
 	else return 'grey'
 }
+
+function NaNCheck(x, d=false) {
+	if (d) {
+		x = new Decimal(x);
+		if (isNaN(x.sign)||isNaN(x.layer)||isNaN(x.mag)) return new Decimal(0);
+		else return x;
+	} else {
+		if (isNaN(x)) return 0;
+		else return x;
+	}
+}

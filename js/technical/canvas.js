@@ -80,8 +80,11 @@ function drawTreeBranch(num1, data, prefix) { // taken from Antimatter Dimension
 		let x2 = end.left + (end.width / 2) + document.body.scrollLeft;
 		let y2 = end.top + (end.height / 2) + document.body.scrollTop;
 		ctx.lineWidth = width;
+	    Ketherpath()
+		if(player.Hkm.unlocked) Hokmapath()
+		ctx.strokeStyle = color_id;
+		ctx.lineWidth = width;
 		ctx.beginPath();
-		ctx.strokeStyle = color_id
 		ctx.moveTo(x1, y1);
 		ctx.lineTo(x2, y2);
 		ctx.stroke();
@@ -93,4 +96,52 @@ function drawTreeBranch(num1, data, prefix) { // taken from Antimatter Dimension
 			ctx.stroke();
 			ctx.closePath();
 		}
+}
+function Ketherpath(){
+	ctx.lineWidth = '3';
+	ctx.strokeStyle = 'white';
+	let s1 = document.getElementById('Ktr').getBoundingClientRect();
+	let xk = s1.left + (s1.width / 2) + document.body.scrollLeft;
+    let yk = s1.top + (s1.height / 2) + document.body.scrollTop;
+	ctx.beginPath();
+	ctx.moveTo(xk-200, yk);
+	ctx.lineTo(xk, yk);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.arc(xk-228,yk-28,5,0,2*Math.PI)
+	ctx.moveTo(xk-225, yk-25);
+	ctx.lineTo(xk-200, yk);
+	ctx.stroke();
+	ctx.strokeStyle = 'green';
+	ctx.beginPath();
+	ctx.moveTo(xk-Number(player.points.add(1).log(10).min(200)), yk);
+	ctx.lineTo(xk, yk);
+	if(player.points.gte(1e200)){
+	    ctx.moveTo(xk-225, yk-25);
+		ctx.lineTo(xk-200, yk);
+		ctx.arc(xk-228,yk-28,5,0,2*Math.PI)
+		ctx.stroke();
+	}
+	ctx.stroke();
+}
+function Hokmapath(){
+	ctx.lineWidth = '3';
+	ctx.strokeStyle = 'grey';
+	let s1 = document.getElementById('Hkm').getBoundingClientRect();
+	let xk = s1.left + (s1.width / 2) + document.body.scrollLeft;
+    let yk = s1.top + (s1.height / 2) + document.body.scrollTop;
+	ctx.beginPath();
+	ctx.moveTo(xk-200, yk);
+	ctx.lineTo(xk, yk);
+	ctx.stroke();
+	ctx.beginPath();
+	ctx.arc(xk-228,yk-28,5,0,2*Math.PI)
+	ctx.moveTo(xk-225, yk-25);
+	ctx.lineTo(xk-200, yk);
+	ctx.stroke();
+	ctx.strokeStyle = 'green';
+	ctx.beginPath();
+	ctx.moveTo(xk-Number(n(50).add(player.points.add(1).log(10).sub(200).div(22.5).min(150))), yk);
+	ctx.lineTo(xk, yk);
+	ctx.stroke();
 }
