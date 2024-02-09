@@ -28,6 +28,8 @@ function drawTree() {
 	if (!retrieveCanvasData()) return;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	for (layer in layers){
+		Ketherpath()
+		if(player.Hkm.storyUnlocked >= 1) Hokmapath()
 		if (tmp[layer].layerShown == true && tmp[layer].branches){
 			for (branch in tmp[layer].branches)
 				{
