@@ -684,7 +684,7 @@ const Modal = {
 				</div>
 				<div v-if="Modal.data.bind" :is="Modal.data.bind" :data="Modal.data.bindData"></div>
 				<div v-html="Modal.data.text()" style="text-align: left; padding: 10px"></div>
-				<div style="position: absolute; bottom: 120px; left: 38%; width:100%; transform: translateX(-50%); text-align: center">
+				<div style="position: absolute; bottom: 120px; left: 44%; width:100%; transform: translateX(-50%); text-align: center">
 					<button class='tabButton' v-for="(btn,i) in Modal.data.buttons" @click="btn.onClick" style="min-width: 5px; margin: 0 5px" v-bind:style='[{"border-color": Modal.data.color,"opacity": btn.unlocked()? "1":"0","visibility": btn.unlocked()? "visible":"hidden"}]'>{{btn.text}}</button>
 				</div>
 				<div v-bind:style='[{"border-color": Modal.data.color}]' style="border: 2px solid white;border-radius:5px; height: 25px; position: absolute; bottom: 50px; left: 44%; width: 100px; font-size:20px; padding:10px"
@@ -836,6 +836,11 @@ var texts =
 		"Playing click games for a long time can pose a risk of tenosynovitis. Pay attention to rest.",
 		"After playing for a long time, remember to close your eyes and rest for a while~",
 		"As is well known, the author's year has 377 days",
+		"Dev Haste x2. Next version will come out much sooner.",
+		"Where is te 6th stage?",
+		"I swear on the darkest night I'll end it all and... Sorry, I forgot what's next.",
+		"We must distort the fate of destruction through retribution, scramble into the chariot of revival, and enjoy the luminescence of the crave wave.",
+		"Oo0.o0.oO",
     ]
 var p = 50 + (document.body.clientWidth / 2.4)
 var l = -50 - (newsText.innerText.length * 20)
