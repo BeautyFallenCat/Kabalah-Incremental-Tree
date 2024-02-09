@@ -81,7 +81,7 @@ function drawTreeBranch(num1, data, prefix) { // taken from Antimatter Dimension
 		let y2 = end.top + (end.height / 2) + document.body.scrollTop;
 		ctx.lineWidth = width;
 	    Ketherpath()
-		if(player.Hkm.unlocked) Hokmapath()
+		if(player.Hkm.storyUnlocked >= 1) Hokmapath()
 		ctx.strokeStyle = color_id;
 		ctx.lineWidth = width;
 		ctx.beginPath();
