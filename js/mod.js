@@ -13,7 +13,7 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "Hkm.He.7pro",
+	num: "Hkm.Hf.8",
 	name: "Literally nothing",
 }
 
