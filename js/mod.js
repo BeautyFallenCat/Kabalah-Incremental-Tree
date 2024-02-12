@@ -49,6 +49,7 @@ function getPointGen() {
 	if(hasMilestone('Hkm','Hkm-1')) gain = gain.mul(tmp.Hkm.effect)
 	if(hasUpgrade('Hkm','Hkm-4')) gain = gain.mul(1e50)
 	if(player.Hkm.storyUnlocked >= 6) gain = gain.mul(tmp.Hkm.foemEff1)
+	if(hasUpgrade('Ktr','Ktr-18')) gain = gain.mul(tmp.Hkm.BatteryEff2)
 	return gain
 }
 
@@ -208,14 +209,14 @@ var displayThings = [
 	}
 	, function() {
 		if ((player.points.add(1).log10().gte(200)) && (player.points.add(1).log10().lt(240)))
-			return "<text style='color:grey'>[1st Hokma Dimension] If you write 2 numbers per second, write down your essence amount will need " + formatTime(player.points.add(1).log10().div(2)) + ". During this period, the author has already completed " + format(player.points.add(1).log10().div(2).div(60).mul(32)) + " sit ups."
+			return "<text style='color:grey'>[1st Hokma Dimension] If you write 2 numbers per second, writing down your essence amount will need " + formatTime(player.points.add(1).log10().div(2)) + ". During this period, the author has already completed " + format(player.points.add(1).log10().div(2).div(60).mul(32)) + " sit ups."
 	}
 	, function() {
 		if ((player.points.add(1).log10().gte(240)) && (player.points.add(1).log10().lt(494)))
-			return "<text style='color:grey'>[2nd Hokma Dimension] If you write 2 numbers per second, write down your essence amount will need " + formatTime(player.points.add(1).log10().div(2)) + ". During this period, the author has already completed " + format(player.points.add(1).log10().div(2).div(60).div(3.75).mul(100)) + "% of 800m run."
+			return "<text style='color:grey'>[2nd Hokma Dimension] If you write 2 numbers per second, writing down your essence amount will need " + formatTime(player.points.add(1).log10().div(2)) + ". During this period, the author has already completed " + format(player.points.add(1).log10().div(2).div(60).div(3.75).mul(100)) + "% of 800m run."
 	}, function() {
 		if ((player.points.add(1).log10().gte(494)) && (player.points.add(1).log10().lt(14400)))
-			return "<text style='color:grey'>[3rd Hokma Dimension] If you write 2 numbers per second, write down your essence amount will need " + formatTime(player.points.add(1).log10().div(2)) + ". During this period, a subject of an average SAT exam is completed " + format(player.points.add(1).log10().div(2).div(200).div(72).mul(100)) + "%."
+			return "<text style='color:grey'>[3rd Hokma Dimension] If you write 2 numbers per second, and determine to end writing in 2024, you need to start at 2023/12/31 " + formatTime(n(86400).sub(player.points.add(1).log10().div(2))) + ". (An average Chinese people go bed at 23:30)"
 	},
 ]
 

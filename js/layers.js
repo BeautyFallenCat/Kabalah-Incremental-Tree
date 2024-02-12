@@ -165,7 +165,7 @@ addLayer("Ktr", {
     color: "#FFFFFF",
     requires: new Decimal(10), // Can be a function that takes requirement increases into account
     resource: "kether points", // Name of prestige currency
-    baseResource: "points", // Name of resource prestige is based on
+    baseResource: "essences", // Name of resource prestige is based on
     baseAmount() {return player.points}, // Get the current amount of baseResource
     type: "normal", // normal: cost to gain currency depends on amount gained. static: cost depends on how much you already have
     exponent: 0.5, // Prestige currency exponent
@@ -1186,6 +1186,7 @@ addLayer("Ktr", {
         if(hasMilestone('Hkm','Hkm-1')) mult = mult.mul(tmp.Hkm.effect)
         if(hasUpgrade('Hkm','Hkm-5')) mult = mult.mul(1e50)
         if(player.Hkm.storyUnlocked >= 6) mult = mult.mul(tmp.Hkm.foemEff1)
+        if(hasUpgrade('Ktr','Ktr-18')) mult = mult.mul(tmp.Hkm.BatteryEff2)
         return mult
     },
     gainExp() { // Calculate the exponent on main currency from bonuses
@@ -1262,7 +1263,7 @@ addLayer("Ktr", {
         },
         'Ktr-3': {
             title() {return quickColor('['+this.id+']'+'<h3>Pure white waves<br>',hasUpgrade(this.layer,this.id)?'green':'')},
-            description() {return 'Boost points gain based on itself.'},
+            description() {return 'Boost essences gain based on itself.'},
             effect() {
                 let eff = player.points.add(1).pow(hasUpgrade('Ktr','Ktr-4')? 1.5 : 1).pow(hasUpgrade('Ktr','Ktr-5')? 1.5 : 1).log(9).add(1)
                 if(hasUpgrade('Ktr','Ktr-7')) eff = eff.mul(upgradeEffect('Ktr','Ktr-7'))
@@ -1544,7 +1545,7 @@ addLayer("Ktr", {
             }
         },
         'Ktr-18': {
-            title() {return quickColor('['+this.id+']'+'<h3>Eternal Snow<br>',hasUpgrade(this.layer,this.id)?'green':'')},
+            title() {return quickColor('['+this.id+']'+'<h3>Startail<br>',hasUpgrade(this.layer,this.id)?'green':'')},
             description() {return 'Unlock Eternal Battery and transfer Ne-box 5 times faster.'},
             color(){return '#ffffff'},
             canAfford() {return player.Ktr.points.gte(this.cost())},
@@ -1560,7 +1561,48 @@ addLayer("Ktr", {
             },
             effectDisplay() {return '×'+format(layers.Ktr.upgrades[this.layer,this.id].effect())},
             unlocked() {
-                return hasUpgrade('Ktr','Ktr-16') && hasAchievement('Ain','Hkm-17')
+                return hasUpgrade('Ktr','Ktr-17') && hasAchievement('Ain','Hkm-16')
+            }
+        },
+        'Ktr-19': {
+            title() {return quickColor('['+this.id+']'+'<h3>Don’t Let Me Down<br>',hasUpgrade(this.layer,this.id)?'green':'')},
+            description() {return 'Global boxes gaining multiplier is based on Ne-boxes.'},
+            color(){return '#ffffff'},
+            canAfford() {return player.Ktr.points.gte(this.cost())},
+            cost() {return n('1e2100')},
+            style() {
+                if(!hasUpgrade(this.layer,this.id)&&!this.canAfford()){return ''}
+                else if(!hasUpgrade(this.layer,this.id)&&this.canAfford()){return {'box-shadow':'inset 0px 0px 5px '+(player.timePlayed%2+5)+'px '+this.color(), 'background-color':'black', 'color':'white', 'height':'130px', 'width':'130px','border-color':'white'}}
+                else return {'background-color':this.color(), 'color':'black', 'border-color':'green', 'box-shadow':'0px 0px 5px '+(player.timePlayed%2+5)+'px '+this.color(), 'height':'130px', 'width':'130px'}
+            },
+            effect() {
+                let eff = n(10).mul(n(1).add(player.Hkm.NeBox).max(1).log(100).add(1))
+                if(hasUpgrade('Ktr','Ktr-20')) eff = eff.pow(2)
+                return eff
+            },
+            effectDisplay() {return '×'+format(layers.Ktr.upgrades[this.layer,this.id].effect())},
+            unlocked() {
+                return hasUpgrade('Ktr','Ktr-18') && hasAchievement('Ain','Hkm-16')
+            }
+        },
+        'Ktr-20': {
+            title() {return quickColor('['+this.id+']'+'<h3>Into the Night<br>',hasUpgrade(this.layer,this.id)?'green':'')},
+            description() {return 'Square Ktr-19.'},
+            color(){return '#ffffff'},
+            canAfford() {return player.Ktr.points.gte(this.cost())},
+            cost() {return n('1e2333')},
+            style() {
+                if(!hasUpgrade(this.layer,this.id)&&!this.canAfford()){return ''}
+                else if(!hasUpgrade(this.layer,this.id)&&this.canAfford()){return {'box-shadow':'inset 0px 0px 5px '+(player.timePlayed%2+5)+'px '+this.color(), 'background-color':'black', 'color':'white', 'height':'130px', 'width':'130px','border-color':'white'}}
+                else return {'background-color':this.color(), 'color':'black', 'border-color':'green', 'box-shadow':'0px 0px 5px '+(player.timePlayed%2+5)+'px '+this.color(), 'height':'130px', 'width':'130px'}
+            },
+            effect() {
+                let eff = n(2)
+                return eff
+            },
+            effectDisplay() {return '^'+format(layers.Ktr.upgrades[this.layer,this.id].effect())},
+            unlocked() {
+                return hasUpgrade('Ktr','Ktr-19') && hasAchievement('Ain','Hkm-16')
             }
         },
     },
@@ -1579,7 +1621,7 @@ addLayer("Ktr", {
             },
             "Star Observation Platform":{
                 content:[
-                    ['display-text',function(){return '<h4>You have '+quickBigColor(formatWhole(player.Ktr.stallar),'Moccasin') +' Stallar points, boost essence gain by '+quickBigColor('×'+format(tmp.Ktr.stallarEff),'moccasin')+' .'}],
+                    ['display-text',function(){return '<h4>You have '+quickBigColor(formatWhole(player.Ktr.stallar),'Moccasin') +' Stallar points, boosting essence gain by '+quickBigColor('×'+format(tmp.Ktr.stallarEff),'moccasin')+' .'}],
                     "blank",
                     ['clickable','Ktr-s1'],
                     "blank",
@@ -1614,7 +1656,7 @@ addLayer("Ktr", {
             },
             "Remote Space":{
                 content:[
-                ['display-text',function(){return '<h4>Your ark has received   '+quickBigColor(formatWhole(tmp.Ktr.solarEnergy),'lavender') +' solar Energy. that boosts to ark effect and yellow dwarf effect '+quickBigColor('×'+format(tmp.Ktr.solarEff),'lavender')}],
+                ['display-text',function(){return '<h4>Your ark has received   '+quickBigColor(formatWhole(tmp.Ktr.solarEnergy),'lavender') +' solar Energy. which boosts to ark effect and yellow dwarf effect '+quickBigColor('×'+format(tmp.Ktr.solarEff),'lavender')}],
                 ['display-text',function(){return quickBigColor('[Universal layer:'+tmp.Ktr.solarLayer[player.Ktr.solarLayer]+']',tmp.Ktr.solarColor[player.Ktr.solarLayer])}],
                 ['clickable','Ktr-r1'],
                 'blank',
@@ -1637,7 +1679,7 @@ addLayer("Ktr", {
             },
             "Moments Watch Shop":{
                 content:[
-                ['display-text',function(){return '<h4>The recollection of kether is in dipth '+quickBigColor(formatWhole(tmp.Ktr.memoryLevel),'white') +', provides the following bonuses'}],
+                ['display-text',function(){return '<h4>The recollection of kether is in dipth '+quickBigColor(formatWhole(tmp.Ktr.memoryLevel),'white') +', providing the following bonuses'}],
                 ['display-text',function(){return '<h4>'+quickBigColor(formatWhole(tmp.Ktr.memorytoNext)+'%','white') +' to next'}],
                 "blank",
                 ['infobox','Ktr-i1'],
@@ -1655,7 +1697,7 @@ addLayer("Ktr", {
                     ['bar','Ktr-g2'],
                     ['bar','Ktr-g3'],
                     "blank",
-                    ['display-text',function(){if(player.Ktr.storyUnlocked >= 9)return '<h4>You have collected a total of   '+quickBigColor(formatWhole(player.Ktr.memoryCrystal),'white') +' memory crystal. Itself boosts the effect of solar energy.(Uneffected by the nerf of heart gate)'}],
+                    ['display-text',function(){if(player.Ktr.storyUnlocked >= 9)return '<h4>You have collected a total of   '+quickBigColor(formatWhole(player.Ktr.memoryCrystal),'white') +' memory crystal. Itself boosts the effect of solar energy.(Unaffected by the nerf of heart gate)'}],
                     ['display-text',function(){if(player.Ktr.activeChallenge == 'Ktr-g1')return '<h4>Universal timespan: '+quickBigColor(formatTime(player.Ktr.universalTime),'white')}],
                     ['display-text',function(){if(player.Ktr.activeChallenge == 'Ktr-g1')return '<h4>Reality timespan: '+quickBigColor(formatTime(player.Ktr.realTime),'white')+', translated to a stallar nerf of '+quickBigColor('^'+format(tmp.Ktr.gateEff),'white')}],
                     ['display-text',function(){if(player.Ktr.activeChallenge == 'Ktr-g1')return '<h4>You have '+quickBigColor(formatWhole(tmp.Ktr.antimatter),'white')+' antimatter.'}],
@@ -1746,6 +1788,7 @@ addLayer("Hkm", {
         foems: new Decimal(0),
         PeBox: new Decimal(0),
         NeBox: new Decimal(0),
+        maxBet: new Decimal(0),
                      // "points" is the internal name for the main resource of the layer.
     }},
     symbol(){return "Hkm<sup>"+player.Hkm.storyUnlocked},
@@ -1802,6 +1845,7 @@ addLayer("Hkm", {
         if(hasAchievement('Ain','Hkm-16') && player.Hkm.storyUnlocked == 7) story = 8;
         if(hasMilestone('Hkm','Hkm-17') && player.Hkm.storyUnlocked == 8) story = 9;
         if(hasUpgrade('Ktr','Ktr-18') && player.Hkm.storyUnlocked == 9) story = 10;
+        if(hasMilestone('Hkm','Hkm-18') && player.Hkm.storyUnlocked == 10) story = 11;
         return story
     },
     totalCompressor(){
@@ -1817,17 +1861,6 @@ addLayer("Hkm", {
     timeThroemEff()
     {
         let eff = Decimal.pow(n(25),player.Hkm.totalTimeThroem)
-        return eff
-    },
-    effect(){
-        if(!hasMilestone('Hkm','Hkm-1')) return n(1)
-        let eff = n(2).mul(player.Hkm.points.root(hasUpgrade('Hkm','Hkm-2')? 1 : 2))
-        if(hasMilestone('Hkm','Hkm-1')) eff = eff.mul(tmp.Ain.effect)
-        if(player.Hkm.storyUnlocked >= 2) eff = eff.mul(tmp.Hkm.timeThroemEff)
-        if(hasGrid('Hkm',102)) eff = eff.mul(getEffect('',102))
-        if(hasGrid('Hkm',202)) eff = eff.mul(getEffect('',202))
-        if(hasGrid('Hkm',302)) eff = eff.mul(getEffect('',302))
-        if(hasGrid('Hkm',402)) eff = eff.mul(getEffect('',402))
         return eff
     },
     gridStrength(){
@@ -1866,8 +1899,9 @@ addLayer("Hkm", {
         return eff
     },
     foemEff2(){
-        let eff = Decimal.pow(3,player.Hkm.foems).sub(1)
+        let eff = Decimal.pow(3,player.Hkm.foems).sub(1).pow(hasUpgrade('Ktr','Ktr-18')? buyableEffect('Hkm','Hkm-b1').add(1) : 1)
         if(hasUpgrade('Ktr','Ktr-16')) eff = eff.mul(upgradeEffect('Ktr','Ktr-16'))
+        if(hasUpgrade('Ktr','Ktr-19')) eff = eff.mul(upgradeEffect('Ktr','Ktr-19'))
         return eff
     },
     boxGain(){
@@ -1876,21 +1910,23 @@ addLayer("Hkm", {
         if(hasUpgrade('Ktr','Ktr-16')) gain = gain.mul(upgradeEffect('Ktr','Ktr-16'))
         if(hasUpgrade('Ktr','Ktr-17')) gain = gain.mul(upgradeEffect('Ktr','Ktr-17'))
         if(hasUpgrade('Ktr','Ktr-18')) gain = gain.mul(upgradeEffect('Ktr','Ktr-18'))
+        if(hasUpgrade('Ktr','Ktr-19')) gain = gain.mul(upgradeEffect('Ktr','Ktr-19'))
         return gain
     },
     NeBoxStroage(){
         let str = n(1000)
+        if(hasUpgrade('Ktr','Ktr-18')) str = str.pow(buyableEffect('Hkm','Hkm-b2'))
         return str
     },
     NeBoxEff(){
-        let eff = player.Hkm.NeBox.add(1).log(1e10).add(1).cbrt().recip()
+        let eff = player.Hkm.NeBox.div(buyableEffect('Hkm','Hkm-b3')).add(1).log(1e10).add(1).cbrt().recip()
         return eff
     },
     NeBoxGain(){
         return tmp.Hkm.foemEff2.sub(tmp.Hkm.boxGain)
     },
     PeBoxExp(){
-        let exp = n(1.4)
+        let exp = n(1.4).add(hasUpgrade('Ktr','Ktr-18')? buyableEffect('Hkm','Hkm-b1') : 0)
         return exp
     },
     PeBoxEff(){
@@ -1901,6 +1937,14 @@ addLayer("Hkm", {
     PeBoxGain(){
         if(tmp.Hkm.NeBoxGain.lte(0)) return tmp.Hkm.foemEff2
         else return tmp.Hkm.boxGain
+    },
+    BatteryEff1(){
+        let eff = Decimal.pow(413,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).max(2).sub(2))
+        return eff
+    },
+    BatteryEff2(){
+        let eff = Decimal.pow(1e100,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).pow(0.85)).mul(getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).pow(4)).add(1)
+        return eff
     },
     totalGrid(){
         let total = 0
@@ -1932,6 +1976,7 @@ addLayer("Hkm", {
             player.Hkm.NeBox = n(0)
         }
         if(hasAchievement('Ain','Hkm-17')) HokmaGridC[204] = 11
+        if(getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).gt(player.Hkm.maxBet)) player.Hkm.maxBet = getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3'))
     },
     upgrades: {
         'Hkm-1': {
@@ -2067,7 +2112,7 @@ addLayer("Hkm", {
         },
         'Hkm-10': {
             title() {return quickColor('['+this.id+']'+'<h3>Destruction 123<br>',hasUpgrade(this.layer,this.id)?'lime':'')},
-            description() {return 'subtract 10,000 from the cost of z-axis time compressor.'},
+            description() {return 'divide 10,000 from the cost of z-axis time compressor.'},
             color(){return 'grey'},
             canAfford() {return player.Hkm.points.gte(this.cost())},
             cost() {return n(1e38)},
@@ -2337,7 +2382,32 @@ addLayer("Hkm", {
                 <text style='color:magenta'>[Ain] But the registration will only end in 5 minutes.</text><br>
                 `
                 if(player.Hkm.storyUnlocked < 11) text += `<br><br>
-                <i style='color: #444444'>[Locked] Congratulations! You have reached the current endgame of vHkm.He.7.</i>`
+                <i style='color: #444444'>[Locked] Unlock fuel battery to continue.</i>`
+                if(player.Hkm.storyUnlocked >= 11) text += `
+                <text style='color: #777777'>[Hokma-768] Give us a chance, this game is very important to us.</text><br>
+                <text style='color: #777777'>[Hokma] Why didn't you come earlier? Is it okay to take responsibility for oneself? Do you want me to set an alarm for you? Go back!</text><br>
+                <text style='color: #777777'>[Hokma-768] But in previous years, there were additional spots added after the selection competition ended? Even the queen who participated in the last competition was only after the semi-finals——</text><br>
+                <text style='color: #777777'>[Hokma] What is the queen and who are you? The special channel is only open to beautiful people. You, like those girls on the street, have an ordinary appearance. It's not wrong to be ordinary, but it's your fault to have privileges despite your ordinary appearance!</text><br>
+                <text style='color:magenta'>[Ain] Are the judges of Star Feather Swan using this standard of evaluation?</text><br>
+                <text style='color: #777777'>[Hokma] What, do you have any objections?</text><br>
+                <text style='color:magenta'>[Ain] The standard of beauty is not absolute.</text><br>
+                <text style='color: #777777'>[Hokma] You actually insulted the judges and slandered the competition at the scene.</text><br>
+                <text style='color:magenta'>[Ain] Didn't you just say that the game has ended?</text><br>
+                <text style='color: #777777'>[Hokma] The shameless little girl, let me teach you a lesson. You can decide the theme of the memory competition.</text><br>
+                <text style='color: #999999'>[Illustration] Ah Huan panicked and quickly told Ain that this judge is a well-known senior matchmaker in the Sephirah Alliance, specifically responsible for commenting on the matching of contestants in the competition.</text><br>
+                `
+                return text
+            }
+        },
+        12:{
+            text(){ 
+                let text = `
+                <text style='color:magenta'>[Ain] It's okay, I don't believe that someone with such a superficial understanding of Sephirah would have such strong memory power.</text><br>
+                <text style='color:magenta'>[Ain] So, let's set the theme as "highly respected judges".</text><br>
+                <text style='color: #777777'>[Hokma] Oh, I actually set a theme that I'm good at, arrogant!</text><br>
+                `
+                if(player.Hkm.storyUnlocked < 12) text += `<br><br>
+                <i style='color: #444444'>[Locked] Congratulations! You have reached the curent endgame of vHkm.Hf.8.</i>`
                 return text
             }
         },
@@ -2550,6 +2620,17 @@ addLayer("Hkm", {
             },
             unlocked() {return hasMilestone(this.layer,'Hkm-1'+Number(this.id[5]-1))}
         },
+        'Hkm-18': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Unlock fuel battery.(Under the eternal battery tab, coming soon.)`},
+            req: n(1e136),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-1'+Number(this.id[5]-1))}
+        },
     },
 
     layerShown() { return player.Ktr.memoryCrystal.gte(1e20) || player.Hkm.storyUnlocked >= 1 },          // Returns a bool for if this layer's node should be visible in the tree.
@@ -2649,6 +2730,7 @@ addLayer("Hkm", {
             cost(x){
                 if (x.gte(10)) x = x.pow(x.div(10))
 				let cost = Decimal.pow(10, x).mul(100)
+                if(player.Hkm.storyUnlocked >= 10) cost = cost.div(tmp.Hkm.BatteryEff1)
                 return cost
             },
             buy(){
@@ -2674,6 +2756,7 @@ addLayer("Hkm", {
             cost(x){
                 if (x.gte(20)) x = x.pow(x.div(20))
 				let cost = Decimal.pow(15, x).mul(200)
+                if(player.Hkm.storyUnlocked >= 10) cost = cost.div(tmp.Hkm.BatteryEff1)
                 return cost
             },
             buy(){
@@ -2699,6 +2782,7 @@ addLayer("Hkm", {
             cost(x){
                 if (x.gte(20)) x = x.pow(x.div(20))
 				let cost = Decimal.pow(150, x).mul(1000)
+                if(player.Hkm.storyUnlocked >= 10) cost = cost.div(tmp.Hkm.BatteryEff1)
                 return cost
             },
             buy(){
@@ -2724,6 +2808,7 @@ addLayer("Hkm", {
             cost(x) {
 				if (x.gte(10)) x = x.pow(x.div(10))
 				let cost = Decimal.pow(10, x).mul(1000)
+                if(player.Hkm.storyUnlocked >= 10) cost = cost.div(tmp.Hkm.BatteryEff1)
 				return cost.floor()
 			},
             buy(){
@@ -2745,6 +2830,7 @@ addLayer("Hkm", {
             cost(x) {
 				if (x.gte(10)) x = x.pow(x.div(10))
 				let cost = Decimal.pow(1e6, x).mul(1e29)
+                if(player.Hkm.storyUnlocked >= 10) cost = cost.div(tmp.Hkm.BatteryEff1)
 				return cost.floor()
 			},
             effect(x) {
@@ -2770,6 +2856,7 @@ addLayer("Hkm", {
             cost(x) {
 				if (x.gte(10)) x = x.pow(x.div(10))
 				let cost = Decimal.pow(1e10, x).mul(1e40)
+                if(player.Hkm.storyUnlocked >= 10) cost = cost.div(tmp.Hkm.BatteryEff1)
 				return cost.floor()
 			},
 			effect(x) {
@@ -2786,6 +2873,67 @@ addLayer("Hkm", {
             style() {
                 if(!this.canAfford()){return {'background-color':'black', 'color':'white','border-color':'gold','height':'150px'}}
                 else return {'background': 'repeating-linear-gradient(45deg,gold 0px,gold 40px,yellow 40px,yellow 80px)', 'color':'black','border-color':'gold','box-shadow':'inset 3px 3px 3px gold,0px 0px 10px yellow','height':'150px'}
+            }
+        },
+        'Hkm-b1': {
+            title() {return '<h3>[Hkm-b1] Battery Mk.1EZ<br>'},
+            display() {return 'Add 0.1 to exp of Pe-box effect and time foem effect.<br><br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: +"+format(this.effect())+"<br>Cost: "+format(this.cost())+" Pe-box"},
+            canAfford() {return player.Hkm.PeBox.gte(this.cost())},
+            cost(x) {
+				return Decimal.pow(1e4,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).sub(2).max(0).pow(1.05)).mul(1e7).max(1e7)
+			},
+			effect(x) {
+                if(x.gte(3)) x = softcap(x,'root',n(3),3)
+				let eff = x.mul(0.1)
+                return eff
+			},
+            buy(){
+                batteryReset()
+                setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
+            },
+            style() {
+                if(!this.canAfford()){return {'background-color':'black', 'color':'white','border-color':'gold'}}
+                else return {'background': GlowingColor('#ffaa00',10,'#ffdd00'), 'color':'black','border-color':'gold','box-shadow':'inset 3px 3px 3px gold,0px 0px 10px yellow'}
+            }
+        },
+        'Hkm-b2': {
+            title() {return '<h3>[Hkm-b2] Battery Mk.2HD<br>'},
+            display() {return 'Sqaure the time destruction threshold.<br><br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: ^"+format(this.effect())+"<br>Cost: "+format(this.cost())+" Pe-box"},
+            canAfford() {return player.Hkm.PeBox.gte(this.cost())},
+            cost(x) {
+				return Decimal.pow(1e4,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).sub(2).max(0).pow(1.05)).mul(1e7).max(1e7)
+			},
+			effect(x) {
+				let eff = Decimal.pow(2,x)
+                return eff
+			},
+            buy(){
+                batteryReset()
+                setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
+            },
+            style() {
+                if(!this.canAfford()){return {'background-color':'black', 'color':'white','border-color':'gold'}}
+                else return {'background': GlowingColor('#ffaa00',10,'#ffdd00'), 'color':'black','border-color':'gold','box-shadow':'inset 3px 3px 3px gold,0px 0px 10px yellow'}
+            }
+        },
+        'Hkm-b3': {
+            title() {return '<h3>[Hkm-b3] Battery Mk.3IN<br>'},
+            display() {return 'Divide the base in the formula of Ne-box effect.<br><br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: /"+format(this.effect())+"<br>Cost: "+format(this.cost())+" Pe-box"},
+            canAfford() {return player.Hkm.PeBox.gte(this.cost())},
+            cost(x) {
+				return Decimal.pow(1e4,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).sub(2).max(0).pow(1.05)).mul(1e7).max(1e7)
+			},
+			effect(x) {
+				let eff = Decimal.pow(1e3,Decimal.pow(3,x)).div(1000)
+                return eff
+			},
+            buy(){
+                batteryReset()
+                setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
+            },
+            style() {
+                if(!this.canAfford()){return {'background-color':'black', 'color':'white','border-color':'gold'}}
+                else return {'background': GlowingColor('#ffaa00',10,'#ffdd00'), 'color':'black','border-color':'gold','box-shadow':'inset 3px 3px 3px gold,0px 0px 10px yellow'}
             }
         },
     },
@@ -2820,6 +2968,50 @@ addLayer("Hkm", {
                 player.Hkm.timeEnergy = n(0)
             },
         },
+        'Hkm-b1':{
+            title() {return "Sell One"},
+            canClick() {return getBuyableAmount('Hkm','Hkm-b1').gte(1)},
+            style(){
+                if(this.canClick()) return {'background': `gold`, 'color':'black', 'min-height':'50px', 'width':'200px','border-radius':'5px','font-size':'13px','border-color':'yellow'}
+                else return {'min-height':'50px', 'width':'200px','border-radius':'5px','font-size':'13px','background-color':'black','color':'white','border-color':'yellow'}
+            },
+            onClick() {
+                setBuyableAmount('Hkm','Hkm-b1',getBuyableAmount('Hkm','Hkm-b1').sub(1))
+            },
+        },
+        'Hkm-b2':{
+            title() {return "Sell One"},
+            canClick() {return getBuyableAmount('Hkm','Hkm-b2').gte(1)},
+            style(){
+                if(this.canClick()) return {'background': `gold`, 'color':'black', 'min-height':'50px', 'width':'200px','border-radius':'5px','font-size':'13px','border-color':'yellow'}
+                else return {'min-height':'50px', 'width':'200px','border-radius':'5px','font-size':'13px','background-color':'black','color':'white','border-color':'yellow'}
+            },
+            onClick() {
+                setBuyableAmount('Hkm','Hkm-b2',getBuyableAmount('Hkm','Hkm-b2').sub(1))
+            },
+        },
+        'Hkm-b3':{
+            title() {return "Sell One"},
+            canClick() {return getBuyableAmount('Hkm','Hkm-b3').gte(1)},
+            style(){
+                if(this.canClick()) return {'background': `gold`, 'color':'black', 'min-height':'50px', 'width':'200px','border-radius':'5px','font-size':'13px','border-color':'yellow'}
+                else return {'min-height':'50px', 'width':'200px','border-radius':'5px','font-size':'13px','background-color':'black','color':'white','border-color':'yellow'}
+            },
+            onClick() {
+                setBuyableAmount('Hkm','Hkm-b3',getBuyableAmount('Hkm','Hkm-b3').sub(1))
+            },
+        },
+    },
+    effect(){
+        if(!hasMilestone('Hkm','Hkm-1')) return n(1)
+        let eff = n(2).mul(player.Hkm.points.root(hasUpgrade('Hkm','Hkm-2')? 1 : 2))
+        if(hasMilestone('Hkm','Hkm-1')) eff = eff.mul(tmp.Ain.effect)
+        if(player.Hkm.storyUnlocked >= 2) eff = eff.mul(tmp.Hkm.timeThroemEff)
+        if(hasGrid('Hkm',102)) eff = eff.mul(getEffect('',102))
+        if(hasGrid('Hkm',202)) eff = eff.mul(getEffect('',202))
+        if(hasGrid('Hkm',302)) eff = eff.mul(getEffect('',302))
+        if(hasGrid('Hkm',402)) eff = eff.mul(getEffect('',402))
+        return eff
     },
     tabFormat:{
         'Time Machine':{
@@ -2862,7 +3054,7 @@ addLayer("Hkm", {
                 "blank",
                 ['clickable','Hkm-f1'],
                 "blank",
-                ['display-text',function(){return '<h4>You have '+quickBigColor(formatWhole(player.Hkm.PeBox),'turquoise') +' Pe-Boxes. Raised to a power of '+quickBigColor(tmp.Hkm.PeBoxExp,'turquoise')+', translated to a '+quickBigColor('×'+format(tmp.Hkm.PeBoxEff),'turquoise')+' boost to hokma points gain.'}],
+                ['display-text',function(){return '<h4>You have '+quickBigColor(formatWhole(player.Hkm.PeBox),'turquoise') +' Pe-Boxes. Raised to a power of '+quickBigColor(format(tmp.Hkm.PeBoxExp),'turquoise')+', translated to a '+quickBigColor('×'+format(tmp.Hkm.PeBoxEff),'turquoise')+' boost to hokma points gain.'}],
                 ['display-text',function(){return '<h4>You have '+quickBigColor(formatWhole(player.Hkm.NeBox),'red') +' Ne-Boxes, nerf the effect of Pe-Box to '+quickBigColor(format(tmp.Hkm.NeBoxEff.mul(100))+'%','red')}],
                 ['bar','Hkm-f1'],
                 ["row",[["buyable","Hkm-f1"],["buyable","Hkm-f2"],["buyable","Hkm-f3"]]],
@@ -2873,7 +3065,9 @@ addLayer("Hkm", {
         },
         "Eternal Battery":{
             content:[
-                
+            ['display-text',function(){return '<h4>You have '+quickBigColor(formatWhole(getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3'))),GlowingColor('#ffaa00',10,'#ffdd00')) +' eternal batteries. Divides the cost of all foems by '+quickBigColor('/'+format(tmp.Hkm.BatteryEff1),GlowingColor('#ff8800',10,'#ffaa00'))+', as well as giving '+quickBigColor('×'+formatWhole(tmp.Hkm.BatteryEff2),GlowingColor('#ff6600',10,'#ff8800'))+' to essence and kether points gain.'}],
+            ["row",[["buyable","Hkm-b1"],["buyable","Hkm-b2"],["buyable","Hkm-b3"]]],
+            ["row",[["clickable","Hkm-b1"],["clickable","Hkm-b2"],["clickable","Hkm-b3"]]],
         ],
             unlocked(){return player.Hkm.storyUnlocked >= 10},
             buttonStyle(){return {'background':GlowingColor('#ffaa00',10,'#ffdd00'),'color':'black','box-shadow':'2px 2px 2px orange','border-color':'orange'}}
@@ -3025,6 +3219,13 @@ function hokmaStory(){
                     player.Hkm.storyShowing = 11
                 },
                 unlocked(){return player.Hkm.storyUnlocked >= 10}
+			},
+            12:{
+				text:`12`,
+                onClick(){
+                    player.Hkm.storyShowing = 12
+                },
+                unlocked(){return player.Hkm.storyUnlocked >= 11}
 			},
 		}
 	})
@@ -3197,6 +3398,14 @@ addLayer("Ain", {
             },
 			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
         },
+        'Hkm-18':{
+            name() {return "Light"},
+            tooltip() { return 'Have a eternity battery. (+3 AP)'},
+            done() { return tmp.Hkm.BatteryEff2.gte(1e50)}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(3)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
     },
     row: 'side', // Row the layer is in on the tree (0 is the first row)
     layerShown(){return hasMilestone('Hkm','Hkm-1')},
@@ -3295,4 +3504,14 @@ function getProfix(data, id){
     if(id == 104) profix = '/'
     if(id == 404) profix = '^'
     return profix
+}
+
+function batteryReset(){
+    for(var i = 1; i <= 6; i++){
+        setBuyableAmount('Hkm','Hkm-f'+i,n(0))
+    }
+    player.Hkm.foems = n(0)
+    player.Hkm.PeBox = n(0)
+    player.Hkm.NeBox = n(0)
+    player.Hkm.timeEnergy = n(0)
 }

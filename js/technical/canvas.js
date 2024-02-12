@@ -28,8 +28,8 @@ function drawTree() {
 	if (!retrieveCanvasData()) return;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	for (layer in layers){
-		Ketherpath()
-		if(player.Hkm.storyUnlocked >= 1) Hokmapath()
+		if (document.getElementById('Ktr') != null) Ketherpath()
+		if (player.Hkm.storyUnlocked >= 1 && document.getElementById('Hkm') != null) Hokmapath()
 		if (tmp[layer].layerShown == true && tmp[layer].branches){
 			for (branch in tmp[layer].branches)
 				{
@@ -82,8 +82,6 @@ function drawTreeBranch(num1, data, prefix) { // taken from Antimatter Dimension
 		let x2 = end.left + (end.width / 2) + document.body.scrollLeft;
 		let y2 = end.top + (end.height / 2) + document.body.scrollTop;
 		ctx.lineWidth = width;
-	    Ketherpath()
-		if(player.Hkm.storyUnlocked >= 1) Hokmapath()
 		ctx.strokeStyle = color_id;
 		ctx.lineWidth = width;
 		ctx.beginPath();

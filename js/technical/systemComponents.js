@@ -221,7 +221,7 @@ var systemComponents = {
 
 function pointsColor(){
 	if(player.points.lt(1e200)) return 'white'
-	else return 'grey'
+	else return 'grey'		
 }
 
 function NaNCheck(x, d=false) {
