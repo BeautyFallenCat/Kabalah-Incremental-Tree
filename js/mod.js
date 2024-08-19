@@ -8,12 +8,12 @@ let modInfo = {
 	discordName: "",
 	discordLink: "",
 	initialStartPoints: new Decimal (10), // Used for hard resets and new players
-	offlineLimit: 1,  // In hours
+	offlineLimit: 0,  // In hours
 }
 
 // Set your version in num and name
 let VERSION = {
-	num: "Hkm.Hf.8",
+	num: "Hkm.Hcl.9",
 	name: "Literally nothing",
 }
 
@@ -156,7 +156,7 @@ var displayThings = [
 			return "[24th Kether Dimension] If every essence has a radius of hydrogen atoms, then they can create " + format(player.points.div(new Decimal("1.61e60"))) + " Proxima Centauris."
 	}
 	, function() {
-		if ((player.points.gte("1.61e60")) && (player.points.lt("2.71e63")))
+		if ((player.points.gte("5.52e62")) && (player.points.lt("2.71e63")))
 			return "[25th Kether Dimension] If every essence has a radius of hydrogen atoms, then they can create " + format(player.points.div(new Decimal("5.52e62"))) + " Suns."
 	}
 	, function() {
