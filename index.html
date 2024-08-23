@@ -75,7 +75,7 @@
 			left: (player.tab !== 'none' && player.navTab !== 'none')}"
 			 :style="{'margin-top': !readData(layoutInfo.showTree) && player.tab == 'info-tab' ? '50px' : ''}">
 			<div id="version" onclick="showTab('changelog-tab')" class="overlayThing" style="margin-right: 13px" >
-				{{VERSION.withoutName}}<br>Endgame 1e2150 essences</div>
+				{{VERSION.withoutName}}<br>Endgame 1e2700 essences</div>
 			<button
 			v-if="((player.navTab == 'none' && (tmp[player.tab].row == 'side' || tmp[player.tab].row == 'otherside' || player[player.tab].prevTab)) || player[player.navTab]?.prevTab)"				class="other-back overlayThing" onclick="goBack(player.navTab == 'none' ? player.tab : player.navTab)">←</button>
 			<img id="optionWheel" class="overlayThing" v-if="player.tab!='options-tab'" src="options_wheel.png"

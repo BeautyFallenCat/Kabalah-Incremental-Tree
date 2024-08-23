@@ -13,8 +13,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "Hkm.Hcl.9",
-	name: "Literally nothing",
+	num: "Hkm.Hal.10",
+	name: "Voltage Era",
 }
 
 let changelog = ``
@@ -121,7 +121,7 @@ var displayThings = [
 	}
 	, function() {
 		if ((player.points.gte("1.6e47")) && (player.points.lt("1.28e48")))
-			return "[16th Kether Dimension] If every essence has a radius of hydrogen atoms, then they can create " + format(player.points.div(new Decimal("1.6e47"))) + " ount Qomolangmas."
+			return "[16th Kether Dimension] If every essence has a radius of hydrogen atoms, then they can create " + format(player.points.div(new Decimal("1.6e47"))) + " Mount Qomolangmas."
 	}
 	, function() {
 		if ((player.points.gte("1.28e48")) && (player.points.lt("1.28e51")))
@@ -222,7 +222,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("e280000000"))
+	return player.points.gte(new Decimal("e2700"))
 }
 
 
