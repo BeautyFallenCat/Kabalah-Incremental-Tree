@@ -298,7 +298,7 @@ addLayer("Ktr", {
                 <text style='color:#999999'>[Illustration] This time, Ain felt a different state of mind than before, a deeper power was awakened, and a strange voice appeared in her heart.</text><br>
                 <text style='color:white'>[Kether] What should you, who has lost your memory, use to fight?</text><br>`
                 if(player.Ktr.storyUnlocked == 2) text += `<br><br>
-                <i style='color: #444444'>[Locked] Reach 200,000 essences to continue.(No exaggeration, it is indeed 200 thousand) This may require much stronger upgrade effect.</i>`
+                <i style='color: #444444'>[Locked] Reach 200,000 essences to continue. This may require much stronger upgrade effect.</i>`
                 if(player.Ktr.storyUnlocked >= 3) text += `
                 <text style='color:#999999'>[Illustration] The scene in front of Ain quickly twisted, and Ain found herself appearing among a sea of stars. Ain looked around in confusion, feeling so familiar.</text><br>
                 <text style='color:magenta'>[Ain] Where is there?</text><br>
@@ -1620,6 +1620,7 @@ addLayer("Ktr", {
             effect() {
                 let eff = player.Hkm.batteryThroem.add(1)
                 if(hasUpgrade('Ktr','Ktr-22')) eff = eff.pow(upgradeEffect('Ktr','Ktr-22'))
+                if(hasAchievement('Ain','Hkm-24')) eff = eff.mul(Decimal.pow(1.5,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3'))))
                 return eff
             },
             effectDisplay() {return '×'+format(layers.Ktr.upgrades[this.layer,this.id].effect())},
@@ -1644,7 +1645,7 @@ addLayer("Ktr", {
             },
             effectDisplay() {return '^'+format(layers.Ktr.upgrades[this.layer,this.id].effect())},
             unlocked() {
-                return hasUpgrade('Ktr','Ktr-20') && hasAchievement('Ain','Hkm-16')
+                return hasUpgrade('Ktr','Ktr-21') && hasAchievement('Ain','Hkm-16')
             }
         },
         'Ktr-23': {
@@ -1659,7 +1660,7 @@ addLayer("Ktr", {
                 else return {'background-color':this.color(), 'color':'black', 'border-color':'green', 'box-shadow':'0px 0px 5px '+(player.timePlayed%2+5)+'px '+this.color(), 'height':'130px', 'width':'130px'}
             },
             unlocked() {
-                return hasUpgrade('Ktr','Ktr-20') && hasAchievement('Ain','Hkm-16')
+                return hasUpgrade('Ktr','Ktr-22') && hasAchievement('Ain','Hkm-16')
             }
         },
         'Ktr-24': {
@@ -1679,7 +1680,22 @@ addLayer("Ktr", {
             },
             effectDisplay() {return '×'+format(layers.Ktr.upgrades[this.layer,this.id].effect())},
             unlocked() {
-                return hasUpgrade('Ktr','Ktr-20') && hasAchievement('Ain','Hkm-16')
+                return hasUpgrade('Ktr','Ktr-23') && hasAchievement('Ain','Hkm-16')
+            }
+        },
+        'Ktr-25': {
+            title() {return quickColor('['+this.id+']'+'<h3>Universal Harmony<br>',hasUpgrade(this.layer,this.id)?'green':'')},
+            description() {return 'Gain another alchemy battery.'},
+            color(){return '#ffffff'},
+            canAfford() {return player.Ktr.points.gte(this.cost())},
+            cost() {return n('1e4025')},
+            style() {
+                if(!hasUpgrade(this.layer,this.id)&&!this.canAfford()){return ''}
+                else if(!hasUpgrade(this.layer,this.id)&&this.canAfford()){return {'box-shadow':'inset 0px 0px 5px '+(player.timePlayed%2+5)+'px '+this.color(), 'background-color':'black', 'color':'white', 'height':'130px', 'width':'130px','border-color':'white'}}
+                else return {'background-color':this.color(), 'color':'black', 'border-color':'green', 'box-shadow':'0px 0px 5px '+(player.timePlayed%2+5)+'px '+this.color(), 'height':'130px', 'width':'130px'}
+            },
+            unlocked() {
+                return hasUpgrade('Ktr','Ktr-24') && hasAchievement('Ain','Hkm-16')
             }
         },
     },
@@ -1933,6 +1949,8 @@ addLayer("Hkm", {
         if(hasMilestone('Hkm','Hkm-18') && player.Hkm.storyUnlocked == 10) story = 11;
         if(hasMilestone('Hkm','Hkm-19') && player.Hkm.storyUnlocked == 11) story = 12;
         if(hasAchievement('Ain','Hkm-21') && player.Hkm.storyUnlocked == 12) story = 13;
+        if(hasAchievement('Ain','Hkm-24') && player.Hkm.storyUnlocked == 13) story = 14;
+        if(hasAchievement('Ain','Hkm-28') && player.Hkm.storyUnlocked == 14) story = 15;
         return story
     },
     totalCompressor(){
@@ -1968,6 +1986,7 @@ addLayer("Hkm", {
         if(hasGrid('Hkm',204)) eff = eff.mul(getEffect('',204))
         if(hasGrid('Hkm',304)) eff = eff.mul(getEffect('',304))
         if(hasGrid('Hkm',504)) eff = eff.mul(getEffect('',504))
+        if(hasAchievement('Ain','Hkm-27')) eff = eff.mul(upgradeEffect('Ktr','Ktr-19')).mul(upgradeEffect('Ktr','Ktr-24'))
         return eff
     },
     gridSize(){
@@ -1981,6 +2000,8 @@ addLayer("Hkm", {
     foemReq(){
         let req = n(0)
         if(player.Hkm.foems.lt(20)) req = new Decimal(2.5e4).pow(player.Hkm.foems).mul(1e24)
+        if(player.Hkm.foems.gte(20)) req = new Decimal(2.5e4).pow(player.Hkm.foems).mul(1e24).mul(new Decimal(5e4).pow(player.Hkm.foems.sub(19)))
+        if(hasMilestone('Hkm','Hkm-20')) req = req.div(1e20)
         return req
     },
     foemEff1(){
@@ -2035,7 +2056,7 @@ addLayer("Hkm", {
     },
     Sebox(){
         let box = player.Hkm.PeBox.add(1).mul(player.Hkm.NeBox.add(1))
-        if(hasMilestone('Hkm','Hkm-19')) box = box.pow(1.5)
+        if(hasMilestone('Hkm','Hkm-19')) box = box.pow(1.5+(hasMilestone('Hkm','Hkm-20')? 0.5 : 0))
         return box
     },
     BatteryEff1(){
@@ -2084,7 +2105,12 @@ addLayer("Hkm", {
             player.Hkm.NeBox = n(0)
         }
         if(hasAchievement('Ain','Hkm-17')) HokmaGridC[204] = 11
+        if(hasAchievement('Ain','Hkm-25')) HokmaGridC[504] = 90
+        if(hasAchievement('Ain','Hkm-26')) HokmaGridC[304] = 18
         if(getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).gt(player.Hkm.maxBet)) player.Hkm.maxBet = getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3'))
+    },
+    resetsNothing(){
+        return player.Hkm.storyUnlocked >= 15
     },
     upgrades: {
         'Hkm-1': {
@@ -2547,7 +2573,51 @@ addLayer("Hkm", {
                 <text style='color: #999999'>[Illustration] The old musician looked out the window and nodded, his eyes shining with starlight, and they became a little brighter.</text><br>
                 `
                 if(player.Hkm.storyUnlocked < 14) text += `<br><br>
-                <i style='color: #444444'>[Locked] Congratulations! You have reached the current endgame of version vHkm.Hal.10.</i>`
+                <i style='color: #444444'>[Locked] Enable the leaf battery to continue.</i>`
+                if(player.Hkm.storyUnlocked >= 14) text += `
+                <text style='color:pink'>[You] We didn't register, so we couldn't participate in the competition. What's more, the hospital is so far away from the stage that the old musicians can't see it...</text><br>
+                <text style='color: magenta'>[Ain] We don't need that stage, let's go make the rest of the Meteor Feather, the gray grass is waiting for us.</text><br>
+                <text style='color: #999999'>[Illustration] When came out of the hospital, the night was already deep.</text><br>
+                <text style='color: #999999'>[Illustration] "Grey Grass, it's time for us to take the stage, " Ain held the necklace. At this moment, the Star Feather Swan competition should be underway, it must be very lively. The Gate of the Heart appeared, but the opposite side of the door was quiet and there was no echo.</text><br>
+                <text style='color:pink'>[You] She seemed like... She don't want to come out.</text><br>
+                <text style='color: #999999'>[Illustration] "Grey grass, the stage and costumes are ready for you. It's time to go on stage. Are you scared?</text><br>
+                <text style='color: #999999'>[Illustration] "What do you think you know? "Grey Grass rushed from the Heart Gate to Ain, then lowered her head a moment later, her bangs blocking her eyes.</text><br>
+                <text style='color:pink'>[You] You can no longer hurt Ain!</text><br>
+                <text style='color: #777777'>[Hokma-9] Mocking, trampling, mocking, clothes taken away, violin broken...</text><br>
+                <text style='color: #999999'>[Illustration] Some moments filled with resentment and angry.</text><br>
+                <text style='color: magenta'>[Ain] The fire did not burn away your pain, your hope is gone, the hope you want is a grand meteor shower. Come on, the old musician has been waiting for you to take the stage.</text><br>
+                <text style='color: #777777'>[Hokma-9] Don't be arrogant anymore, you don't even understand my feelings, you don't even know how powerful my heart is.</text><br>
+                <text style='color: #999999'>[Illustration] Ain suddenly be pulled into the battle of collection! But she beat grey grass after moments.</text><br>
+                <text style='color: #999999'>[Illustration] The tattered clothes on the gray grass transformed into meteor feathers dotted with stars.</text><br>
+                `
+                return text
+            }
+        },
+        14:{
+            text(){ 
+                let text = `
+                <text style='color:pink'>[You] Wearing the meteor feather on the gray grass is really beautiful!</text><br>
+                <text style='color: magenta'>[Ain] Yeah, we did it. Meteor shower beautiful!</text><br>
+                <text style='color: #999999'>[Illustration] In the surveillance ward, the old musician looked in surprise at the meteor shower pouring out of the window, and the bright starry sky illuminated the entire Silver Moon Lake. Grey grass wearing meteor feathers appeared in front of him, and she gently hugged him.</text><br>
+                <text style='color: magenta'>[Ain] The flames of the world in the mirror have extinguished, and I should not be consumed by the memories of Grey Grass.</text><br>
+                <text style='color:pink'>[You] Although I haven't received any further clues related to nursery rhymes, it's still worth letting go of the past for Grey Grass.Although I haven't received any further clues related to nursery rhymes, it's still worth letting go of the past for Grey Grass.</text><br>
+                <text style='color: #999999'>[Illustration] A sparkling diamond, resembling a shooting star, landed on the warm palm of my hand, with a faint swan like shape.</text><br>
+                <text style='color: magenta'>[Ain] Will this be left by Kether?</text><br>
+                `
+                if(player.Hkm.storyUnlocked < 15) text += `<br><br>
+                <i style='color: #444444'>[Locked] Unlock Backward Clock to continue. It's the ultimate challenge of Hokma layer.</i>`
+                if(player.Hkm.storyUnlocked >= 15) text += `
+                <text style='color: #999999'>[Illustration] ......</text><br>
+                <text style='color: magenta'>[Ain] Goodbye, old musician. Death is also the beginning of an unknown journey. Goodbye, old musician.</text><br>
+                <text style='color: #999999'>[Illustration] Ain heard a familiar voice and turned to see Binah in the crowd.</text><br>
+                <text style='color: magenta'>[Ain] Binah？ Last time at the bar...</text><br>
+                <text style='color: #3a3a3a'>[Binah] We meet again, Ain and FallenCat.</text><br>
+                <text style='color: magenta'>[Ain] Thank you... I misunderstood you before.</text><br>
+                <text style='color: #3a3a3a'>[Binah] It's my fault for not explaining clearly. Are you also attending the funeral of the old musician?</text><br>
+                <text style='color: magenta'>[Ain] Sure.</text><br>
+                <text style='color: #999999'>[Illustration] Ain's heart stirred as she stood in front of Binah and took out the Star Feather Diamond.</text><br>
+                <text style='color: #3a3a3a'>[Binah] Where did this come from? Hmm... I think the radiance of this diamond may point to another timeline parallel to our time and space, and we need to use the power of the clock of backtracking to help us complete the transition. Do you want to come together?</text><br>
+                `
                 return text
             }
         },
@@ -2561,6 +2631,7 @@ addLayer("Hkm", {
             progress() { return player.Hkm.timeEnergy.div(tmp.Hkm.nextTimeThroem) },
             borderStyle() { return {'border-color':'grey'}},
             fillStyle() { return {'background-color':'grey'}},
+            style() {return {'color':'white'}},
         },
         'Hkm-f1': {
             direction: RIGHT,
@@ -2570,6 +2641,40 @@ addLayer("Hkm", {
             progress() { return player.Hkm.NeBox.div(tmp.Hkm.NeBoxStroage) },
             borderStyle() { return {'border-color':'salmon'}},
             fillStyle() { return {'background-color':'salmon'}},
+            style() {return {'color':'white'}},
+        },
+        'Hkm-bk1': {
+            direction: RIGHT,
+            width: 600,
+            height: 30,
+            display() { return 'Req1: '+format(player.points)+' / '+format('1e4050')+' essences'},
+            progress() { return player.points.add(1).log(10).div(4050) },
+            fillStyle() { if(this.progress().lt(1)) return {'background-color':'#999999'}
+            else return {'background-color':'green'}},
+            style() {return {'color':'white'}},
+            unlocked(){ return true}
+        },
+        'Hkm-bk2': {
+            direction: RIGHT,
+            width: 600,
+            height: 30,
+            display() { return 'Req2: '+formatWhole(player.Hkm.points)+' / '+format('1e225')+' hokma points'},
+            progress() { return player.Hkm.points.add(1).log(10).div(225) },
+            fillStyle() { if(this.progress().lt(1)) return {'background-color':'#999999'}
+            else return {'background-color':'green'}},
+            style() {return {'color':'white'}},
+            unlocked(){ return true}
+        },
+        'Hkm-bk3': {
+            direction: RIGHT,
+            width: 600,
+            height: 30,
+            display() { return 'Req3: '+formatWhole(player.Hkm.timeEnergy)+' / '+formatWhole('1e167')+' time energy'},
+            progress() { return player.Hkm.timeEnergy.add(1).log(10).div(167) },
+            fillStyle() { if(this.progress().lt(1)) return {'background-color':'#999999'}
+            else return {'background-color':'green'}},
+            style() {return {'color':'white'}},
+            unlocked(){ return true}
         },
     },
     milestones: {
@@ -2773,7 +2878,7 @@ addLayer("Hkm", {
         },
         'Hkm-19': {
             requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
-            effectDescription(){ return `———————————————————————————————————————————<br>1.Expend time-space grid.(4×4 → 5×5)<br>2.The gain of Se-box is raised to 150%.<br>3.The gain of hokma points is softcapped.`},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Expend time-space grid.(4×4 → 5×5)<br>2.Divide 1e20 from the cost of time foem.<br>3.The gain of hokma points is softcapped.`},
             req: n(1e150),
             done() { return player.Hkm.points.gte(this.req) },
             style() {
@@ -2781,6 +2886,28 @@ addLayer("Hkm", {
                 else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
             },
             unlocked() {return hasMilestone(this.layer,'Hkm-1'+Number(this.id[5]-1))}
+        },
+        'Hkm-20': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.Gain a free leaf battery.<br>2.The gain of Se-box is raised to 133%.<br>3.Double the effect of Hkm-b1.`},
+            req: n(1e203),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-19')}
+        },
+        'Hkm-21': {
+            requirementDescription() {return quickColor("Get "+formatWhole(this.req)+" Hokma Points ("+formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100).min(100))+"%)",hasMilestone(this.layer,this.id)?'green':'')},
+            effectDescription(){ return `———————————————————————————————————————————<br>1.All batteries are twice as strong per level.<br>2.Gain a free aqua battery.`},
+            req: n(1e218),
+            done() { return player.Hkm.points.gte(this.req) },
+            style() {
+                if(!hasMilestone(this.layer,this.id)){ return {'height':'100px','max-width':'700px','background':`linear-gradient(to right,#999999 ${formatWhole(n(player.Hkm.points).div(tmp.Hkm.milestones[this.id].req).mul(100))}%,grey ${formatWhole(player.Hkm.points.div(tmp.Hkm.milestones[this.id].req).mul(100))}%)`,'border-radius':'5px'}}
+                else return {'background': `repeating-linear-gradient(90deg, #444444 0, #444444 1px, #001700 0,#001700 70px)`,'background-size':'70px','color':'white','height':'100px','max-width':'700px','box-shadow':`0px 0px 4px ${player.timePlayed%2+5}px #444444`}
+            },
+            unlocked() {return hasMilestone(this.layer,'Hkm-2'+Number(this.id[5]-1))}
         },
     },
 
@@ -2895,7 +3022,7 @@ addLayer("Hkm", {
             },
             style() {
                 if(!this.canAfford()){return {'background-color':'black', 'color':'white','border-color':'turquoise','height':'150px'}}
-                else return {'background': 'repeating-linear-gradient(45deg,aqua 0px,aqua 40px,turquoise 40px,turquoise 80px)', 'color':'black','border-color':'turquoise','box-shadow':'inset 3px 3px 3px aqua,0px 0px 10px cyan','height':'150px'}
+                else return {'background': 'repeating-linear-gradient(45deg,aqua 0px,aqua 40px,turquoise 40px,turquoise 80px)', 'color':'black','border-color':'turquoise','box-shadow':'inset 3px 3px 3px aqua,0px 0px 10px #00dddd','height':'150px'}
             }
         },
         'Hkm-f2': {
@@ -2921,7 +3048,7 @@ addLayer("Hkm", {
             },
             style() {
                 if(!this.canAfford()){return {'background-color':'black', 'color':'white','border-color':'turquoise','height':'150px'}}
-                else return {'background': 'repeating-linear-gradient(45deg,aqua 0px,aqua 40px,turquoise 40px,turquoise 80px)', 'color':'black','border-color':'turquoise','box-shadow':'inset 3px 3px 3px aqua,0px 0px 10px cyan','height':'150px'}
+                else return {'background': 'repeating-linear-gradient(45deg,aqua 0px,aqua 40px,turquoise 40px,turquoise 80px)', 'color':'black','border-color':'turquoise','box-shadow':'inset 3px 3px 3px aqua,0px 0px 10px #00dddd','height':'150px'}
             }
         },
         'Hkm-f3': {
@@ -2947,7 +3074,7 @@ addLayer("Hkm", {
             },
             style() {
                 if(!this.canAfford()){return {'background-color':'black', 'color':'white','border-color':'turquoise','height':'150px'}}
-                else return {'background': 'repeating-linear-gradient(45deg,aqua 0px,aqua 40px,turquoise 40px,turquoise 80px)', 'color':'black','border-color':'turquoise','box-shadow':'inset 3px 3px 3px aqua,0px 0px 10px cyan','height':'150px'}
+                else return {'background': 'repeating-linear-gradient(45deg,aqua 0px,aqua 40px,turquoise 40px,turquoise 80px)', 'color':'black','border-color':'turquoise','box-shadow':'inset 3px 3px 3px aqua,0px 0px 10px #00dddd','height':'150px'}
             }
         },
         'Hkm-f4': {
@@ -2973,7 +3100,7 @@ addLayer("Hkm", {
             },
             style() {
                 if(!this.canAfford()){return {'background-color':'black', 'color':'white','border-color':'turquoise','height':'150px'}}
-                else return {'background': 'repeating-linear-gradient(45deg,aqua 0px,aqua 40px,turquoise 40px,turquoise 80px)', 'color':'black','border-color':'turquoise','box-shadow':'inset 3px 3px 3px aqua,0px 0px 10px cyan','height':'150px'}
+                else return {'background': 'repeating-linear-gradient(45deg,aqua 0px,aqua 40px,turquoise 40px,turquoise 80px)', 'color':'black','border-color':'turquoise','box-shadow':'inset 3px 3px 3px aqua,0px 0px 10px #00dddd','height':'150px'}
             }
         },
         'Hkm-f5': {
@@ -3033,11 +3160,12 @@ addLayer("Hkm", {
             display() {return 'Add 0.1 to exp of Pe-box effect and time foem effect.<br><br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: +"+format(this.effect())+"<br>Cost: "+format(this.cost())+" Pe-box"},
             canAfford() {return player.Hkm.PeBox.gte(this.cost())},
             cost(x) {
-				return Decimal.pow(1e4,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).sub(2).max(0).pow(1.05)).mul(1e7).max(1e7).div(buyableEffect('Hkm','Hkm-fb-1-4')).div(buyableEffect('Hkm','Hkm-fb-2-4'))
+				return Decimal.pow(1e4,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).sub(2).max(0).pow(1.05)).mul(1e7).max(1e7).div(buyableEffect('Hkm','Hkm-fb-1-4')).div(buyableEffect('Hkm','Hkm-fb-2-4')).div(buyableEffect('Hkm','Hkm-fb-3-4')).div(buyableEffect('Hkm','Hkm-fb-4-4'))
 			},
 			effect(x) {
                 if(x.gte(3)) x = softcap(x,'root',n(3),3)
 				let eff = x.mul(0.1)
+                if(hasMilestone('Hkm','Hkm-20')) eff = eff.mul(2)
                 return eff
 			},
             buy(){
@@ -3054,7 +3182,7 @@ addLayer("Hkm", {
             display() {return 'Sqaure the time destruction threshold.<br><br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: ^"+format(this.effect())+"<br>Cost: "+format(this.cost())+" Pe-box"},
             canAfford() {return player.Hkm.PeBox.gte(this.cost())},
             cost(x) {
-				return Decimal.pow(1e4,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).sub(2).max(0).pow(1.05)).mul(1e7).max(1e7).div(buyableEffect('Hkm','Hkm-fb-1-4')).div(buyableEffect('Hkm','Hkm-fb-2-4'))
+				return Decimal.pow(1e4,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).sub(2).max(0).pow(1.05)).mul(1e7).max(1e7).div(buyableEffect('Hkm','Hkm-fb-1-4')).div(buyableEffect('Hkm','Hkm-fb-2-4')).div(buyableEffect('Hkm','Hkm-fb-3-4')).div(buyableEffect('Hkm','Hkm-fb-4-4'))
 			},
 			effect(x) {
 				let eff = Decimal.pow(2,x)
@@ -3075,7 +3203,7 @@ addLayer("Hkm", {
             display() {return 'Divide the base in the formula of Ne-box effect.<br><br>Amount: '+getBuyableAmount(this.layer,this.id)+"<br>Effect: /"+format(this.effect())+"<br>Cost: "+format(this.cost())+" Pe-box"},
             canAfford() {return player.Hkm.PeBox.gte(this.cost())},
             cost(x) {
-				return Decimal.pow(1e4,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).sub(2).max(0).pow(1.05)).mul(1e7).max(1e7).div(buyableEffect('Hkm','Hkm-fb-1-4')).div(buyableEffect('Hkm','Hkm-fb-2-4'))
+				return Decimal.pow(1e4,getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).sub(2).max(0).pow(1.05)).mul(1e7).max(1e7).div(buyableEffect('Hkm','Hkm-fb-1-4')).div(buyableEffect('Hkm','Hkm-fb-2-4')).div(buyableEffect('Hkm','Hkm-fb-3-4')).div(buyableEffect('Hkm','Hkm-fb-4-4'))
 			},
 			effect(x) {
 				let eff = Decimal.pow(1e3,Decimal.pow(3,x)).div(1000)
@@ -3098,7 +3226,7 @@ addLayer("Hkm", {
 				return Decimal.pow(2,x).mul(10)
 			},
 			effect(x) {
-				let eff = Decimal.pow(9,x)
+				let eff = Decimal.pow(9*(hasMilestone('Hkm','Hkm-21')? 2 : 1),x)
                 return eff
 			},
             buy(){
@@ -3119,8 +3247,9 @@ addLayer("Hkm", {
 				return Decimal.pow(3,x).mul(10)
 			},
 			effect(x) {
-				let eff = Decimal.pow(81,x)
-                if(hasAchievement('Hkm','Hkm-22')) eff = eff.mul(81)
+				let eff = Decimal.pow(81*(hasMilestone('Hkm','Hkm-21')? 2 : 1),x)
+                if(hasAchievement('Ain','Hkm-22')) eff = eff.mul(81)
+                if(hasUpgrade('Ktr','Ktr-25')) eff = eff.mul(400)
                 return eff
 			},
             buy(){
@@ -3131,6 +3260,52 @@ addLayer("Hkm", {
             },
             unlocked() {
                 return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().gte(2)
+            },
+        },
+        'Hkm-fb-3-4': {
+            title() {return 'Leaf Battery Ft.Ftr3<br>'},
+            display() {return "Reduce the cost of next eternal battery by /"+format(this.effect())+''},
+            canAfford() {return false},
+            cost(x) {
+				return Decimal.pow(4,x).mul(10)
+			},
+			effect(x) {
+				let eff = Decimal.pow(729*(hasMilestone('Hkm','Hkm-21')? 2 : 1),x)
+                if(hasAchievement('Ain','Hkm-24')) eff = eff.mul(729)
+                if(hasMilestone('Hkm','Hkm-20')) eff = eff.mul(729)
+                return eff
+			},
+            buy(){
+                setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
+            },
+            style() {
+                return {'background': GlowingColor('#006600',5,'#00aa00'),'height':'80px','width':'200px','color':'white','border-color':GlowingColor('#007700',5,'#00bb00'),'font-size':'10px','border-radius':'0px'}
+            },
+            unlocked() {
+                return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().gte(3)
+            },
+        },
+        'Hkm-fb-4-4': {
+            title() {return 'Aqua Battery Ft.Byd4<br>'},
+            display() {return "Reduce the cost of next eternal battery by /"+format(this.effect())+''},
+            canAfford() {return false},
+            cost(x) {
+				return Decimal.pow(5,x).mul(10)
+			},
+			effect(x) {
+				let eff = Decimal.pow(6561*(hasMilestone('Hkm','Hkm-21')? 2 : 1),x)
+                if(hasAchievement('Ain','Hkm-26')) eff = eff.mul(6561)
+                if(hasMilestone('Hkm','Hkm-21')) eff = eff.mul(6561)
+                return eff
+			},
+            buy(){
+                setBuyableAmount(this.layer,this.id,getBuyableAmount(this.layer,this.id).add(1))
+            },
+            style() {
+                return {'background': GlowingColor('#222266',3,'#3333aa'),'height':'80px','width':'200px','color':'white','border-color':GlowingColor('#222277',3,'#3333bb'),'font-size':'10px','border-radius':'0px'}
+            },
+            unlocked() {
+                return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().gte(4)
             },
         },
     },
@@ -3250,11 +3425,6 @@ addLayer("Hkm", {
             style(){
                 return {'min-height':'80px', 'width':'560px','border-radius':'0px','font-size':'10px','background-color':'black','color':GlowingColor('#000000',7,'#bb0000'),'border':'3px dotted '+GlowingColor('#000000',7,'#aa0000')}
             },
-            onClick() {
-                setBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4',getBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4').sub(1))
-                player.Hkm.batteryThroem = player.Hkm.batteryThroem.sub(layers.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost())
-                player.Hkm.timeThroem = player.Hkm.timeThroem.add(layers.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost())
-            },
             unlocked() {
                 return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().lt(2)
             }
@@ -3305,6 +3475,172 @@ addLayer("Hkm", {
                 return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().gte(2)
             }
         },
+        'Hkm-fbl-3':{
+            title() {return "[!!! Low Voltage !!!] Leaf Battery Ft.Ftr3<br><br>Let your weakest eternal battery reach Lv.3 to enable this."},
+            canClick() {return false},
+            style(){
+                return {'min-height':'80px', 'width':'560px','border-radius':'0px','font-size':'10px','background-color':'black','color':GlowingColor('#000000',5,'#00bb00'),'border':'3px dotted '+GlowingColor('#000000',5,'#00aa00')}
+            },
+            unlocked() {
+                return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().lt(3) && minBatteryLevel().gte(2)
+            }
+        },
+        'Hkm-fb-3-1':{
+            title() {return "▼"},
+            canClick() {return getBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4').gte(1)},
+            style(){
+                if(this.canClick()) return {'background': GlowingColor('#006600',5,'#006600'), 'color':'white', 'min-height':'80px', 'width':'80px','border-radius':'0px','font-size':'13px','border-color':GlowingColor('#007700',5,'#00bb00')}
+                else return {'min-height':'80px', 'width':'80px','border-radius':'0px','font-size':'13px','background-color':'black','color':GlowingColor('#006600',5,'#006600'),'border-color':GlowingColor('#007700',5,'#00bb00')}
+            },
+            onClick() {
+                setBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4',getBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4').sub(1))
+                player.Hkm.batteryThroem = player.Hkm.batteryThroem.sub(layers.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost())
+                player.Hkm.timeThroem = player.Hkm.timeThroem.add(layers.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost())
+            },
+            unlocked() {
+                return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().gte(3)
+            }
+        },
+        'Hkm-fb-3-2':{
+            title() {return "Generation "+getBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4').add(1)+" / 8<br>Gen up cost: "+formatWhole(tmp.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost)+" time threoms"},
+            canClick() {return false},
+            style(){
+                if(this.canClick()) return {'background': GlowingColor('#006600',5,'#006600'), 'color':'white', 'min-height':'80px', 'width':'80px','border-radius':'0px','font-size':'10px','border-color':GlowingColor('#007700',5,'#00bb00')}
+                else return {'min-height':'80px', 'width':'200px','border-radius':'0px','font-size':'10px','background-color':'black','color':GlowingColor('#006600',5,'#006600'),'border-color':GlowingColor('#007700',5,'#00bb00')}
+            },
+            onClick() {
+                setBuyableAmount('Hkm','Hkm-b3',getBuyableAmount('Hkm','Hkm-b3').sub(1))
+            },
+            unlocked() {
+                return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().gte(3)
+            }
+        },
+        'Hkm-fb-3-3':{
+            title() {return "▲"},
+            canClick() {return player.Hkm.timeThroem.gte(tmp.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost) && getBuyableAmount('Hkm','Hkm-fb-2-4').lt(7)},
+            style(){
+                if(this.canClick()) return {'background': GlowingColor('#006600',5,'#006600'), 'color':'white', 'min-height':'80px', 'width':'80px','border-radius':'0px','font-size':'13px','border-color':GlowingColor('#007700',5,'#00bb00')}
+                else return {'min-height':'80px', 'width':'80px','border-radius':'0px','font-size':'13px','background-color':'black','color':GlowingColor('#006600',5,'#006600'),'border-color':GlowingColor('#007700',5,'#00bb00')}
+            },
+            onClick() {
+                player.Hkm.batteryThroem = player.Hkm.batteryThroem.add(layers.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost())
+                player.Hkm.timeThroem = player.Hkm.timeThroem.sub(layers.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost())
+                setBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4',getBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4').add(1))
+            },
+            unlocked() {
+                return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().gte(3)
+            }
+        },
+        'Hkm-fbl-4':{
+            title() {return "[!!! Low Voltage !!!] Aqua Battery Ft.Byd4<br><br>Let your weakest eternal battery reach Lv.4 to enable this."},
+            canClick() {return false},
+            style(){
+                return {'min-height':'80px', 'width':'560px','border-radius':'0px','font-size':'10px','background-color':'black','color':GlowingColor('#000000',3,'#3333aa'),'border':'3px dotted '+GlowingColor('#000000',3,'#3333bb')}
+            },
+            unlocked() {
+                return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().lt(4) && minBatteryLevel().gte(3)
+            }
+        },
+        'Hkm-fb-4-1':{
+            title() {return "▼"},
+            canClick() {return getBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4').gte(1)},
+            style(){
+                if(this.canClick()) return {'background': GlowingColor('#222266',3,'#3333aa'), 'color':'white', 'min-height':'80px', 'width':'80px','border-radius':'0px','font-size':'13px','border-color':GlowingColor('#222277',3,'#3333bb')}
+                else return {'min-height':'80px', 'width':'80px','border-radius':'0px','font-size':'13px','background-color':'black','color':GlowingColor('#222266',3,'#3333aa'),'border-color':GlowingColor('#222277',3,'#3333bb')}
+            },
+            onClick() {
+                setBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4',getBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4').sub(1))
+                player.Hkm.batteryThroem = player.Hkm.batteryThroem.sub(layers.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost())
+                player.Hkm.timeThroem = player.Hkm.timeThroem.add(layers.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost())
+            },
+            unlocked() {
+                return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().gte(4)
+            }
+        },
+        'Hkm-fb-4-2':{
+            title() {return "Generation "+getBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4').add(1)+" / 8<br>Gen up cost: "+formatWhole(tmp.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost)+" time threoms"},
+            canClick() {return false},
+            style(){
+                if(this.canClick()) return {'background': GlowingColor('#222266',3,'#3333aa'), 'color':'white', 'min-height':'80px', 'width':'80px','border-radius':'0px','font-size':'10px','border-color':GlowingColor('#222277',3,'#3333bb')}
+                else return {'min-height':'80px', 'width':'200px','border-radius':'0px','font-size':'10px','background-color':'black','color':GlowingColor('#222266',3,'#3333aa'),'border-color':GlowingColor('#222277',3,'#3333bb')}
+            },
+            onClick() {
+                setBuyableAmount('Hkm','Hkm-b3',getBuyableAmount('Hkm','Hkm-b3').sub(1))
+            },
+            unlocked() {
+                return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().gte(4)
+            }
+        },
+        'Hkm-fb-4-3':{
+            title() {return "▲"},
+            canClick() {return player.Hkm.timeThroem.gte(tmp.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost) && getBuyableAmount('Hkm','Hkm-fb-2-4').lt(7)},
+            style(){
+                if(this.canClick()) return {'background': GlowingColor('#222266',3,'#3333aa'), 'color':'white', 'min-height':'80px', 'width':'80px','border-radius':'0px','font-size':'13px','border-color':GlowingColor('#222277',3,'#3333bb')}
+                else return {'min-height':'80px', 'width':'80px','border-radius':'0px','font-size':'13px','background-color':'black','color':GlowingColor('#222266',3,'#3333aa'),'border-color':GlowingColor('#222277',3,'#3333bb')}
+            },
+            onClick() {
+                player.Hkm.batteryThroem = player.Hkm.batteryThroem.add(layers.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost())
+                player.Hkm.timeThroem = player.Hkm.timeThroem.sub(layers.Hkm.buyables['Hkm-fb-'+this.id[7]+'-4'].cost())
+                setBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4',getBuyableAmount('Hkm','Hkm-fb-'+this.id[7]+'-4').add(1))
+            },
+            unlocked() {
+                return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().gte(4)
+            }
+        },
+        'Hkm-bk1':{
+            title() {return "[Common] Unknown blueprint"},
+            display() {return "<h3>Collect 3× wood.(1s)"},
+            canClick() {return false},
+            style(){
+                return {'background-color': '#b1b1b1',
+                    'opacity': '1',
+                    'background-image':  'linear-gradient(#9c9c9c 2px, transparent 2px), linear-gradient(90deg, #9c9c9c 2px, transparent 2px), linear-gradient(#9c9c9c 1px, transparent 1px), linear-gradient(90deg, #9c9c9c 1px, #b1b1b1 1px)',
+                    'background-size': '50px 50px, 50px 50px, 10px 10px, 10px 10px',
+                    'background-position': '-2px -2px, -2px -2px, -1px -1px, -1px -1px',
+                    'height':'100px',
+                    'width':'300px',
+                    'border-radius':'5px',
+                    'font-size':'13px',
+                    'border-width':'4px'
+            }},
+            unlocked(){return true}
+        },
+        'Hkm-bk2':{
+            title() {return "[Common] Unknown blueprint"},
+            display() {return "<h3>Collect 3× wood.(1s)"},
+            canClick() {return false},
+            style(){
+                return {'background-color': '#b1b1b1',
+                    'opacity': '1',
+                    'background-image':  'linear-gradient(#9c9c9c 2px, transparent 2px), linear-gradient(90deg, #9c9c9c 2px, transparent 2px), linear-gradient(#9c9c9c 1px, transparent 1px), linear-gradient(90deg, #9c9c9c 1px, #b1b1b1 1px)',
+                    'background-size': '50px 50px, 50px 50px, 10px 10px, 10px 10px',
+                    'background-position': '-2px -2px, -2px -2px, -1px -1px, -1px -1px',
+                    'height':'100px',
+                    'width':'300px',
+                    'border-radius':'5px',
+                    'font-size':'13px',
+                    'border-width':'4px'
+            }},
+            unlocked(){return true}
+        },
+        'Hkm-bk3':{
+            title() {return "[Transcendent] Unknown blueprint"},
+            display() {return "<h3>Collect 10,000× cobalt.(1s)"},
+            canClick() {return false},
+            style(){
+                return {'background-color': 'cyan',
+                    'opacity': '1',
+                    'background-image':  'linear-gradient(#00dddd 2px, transparent 2px), linear-gradient(90deg, #00dddd 2px, transparent 2px), linear-gradient(#00dddd 1px, transparent 1px), linear-gradient(90deg, #00dddd 1px, #00eeee 1px)',
+                    'background-size': '50px 50px, 50px 50px, 10px 10px, 10px 10px',
+                    'background-position': '-2px -2px, -2px -2px, -1px -1px, -1px -1px',
+                    'height':'100px',
+                    'width':'300px',
+                    'border-radius':'5px',
+                    'font-size':'13px',
+                    'border-width':'4px'
+            }},
+            unlocked(){return true}
+        },
     },
     effect(){
         if(!hasMilestone('Hkm','Hkm-1')) return n(1)
@@ -3317,6 +3653,26 @@ addLayer("Hkm", {
         if(hasGrid('Hkm',402)) eff = eff.mul(getEffect('',402))
         if(hasGrid('Hkm',502)) eff = eff.mul(getEffect('',502))
         return eff
+    },
+    challenges:{
+        'Hkm-bk1':{
+            name() {return "Backward Clock "+((this.locked())?'(Locked)':"(Inactive)")},
+            text() {return "♀"},
+            locked() {return player.Hkm.points.lt('1e225') || player.points.lt('1e4050') || player.Hkm.timeEnergy.lt('1e167')},
+            exp: "",
+            color: 'grey',
+            challengeDescription() {
+                let desc = "↑↑Click the symbol of current saphirah to start rebuilding the backward clock!<br>——————————————————<br>Coming soon."
+                return desc
+            },
+            style() {
+                if(!this.locked()) return {'background-color':'#888888','box-shadow':'0px 0px 3px 3px #888888','height':'400px'}
+                else return {'background-color':'#444444','height':'400px'}
+            },
+            onEnter() {
+                player.Hkm.activeChallenge = ''
+            },
+        },
     },
     tabFormat:{
         'Time Machine':{
@@ -3387,6 +3743,32 @@ addLayer("Hkm", {
         ],
             unlocked(){return player.Hkm.storyUnlocked >= 10},
             buttonStyle(){return {'background':GlowingColor('#ffaa00',10,'#ffdd00'),'color':'black','box-shadow':'2px 2px 2px orange','border-color':'orange'}}
+        },
+        "Backward Clock":{
+            content:[
+                ['bar','Hkm-bk1'],
+                ['bar','Hkm-bk2'],
+                ['bar','Hkm-bk3'],
+                ['row',[["column", [["raw-html", function() {}],
+                "blank",['display-text',function(){return '<h3>'}],
+               ['column',["blank",["clickable",'Hkm-bk1'],["clickable",'Hkm-bk2'],["clickable",'Hkm-bk3'],["clickable",'Hkm-bk4']]],
+               "blank",
+               ],
+               {
+                   "color":"white",
+                   "width":"300px",
+                   "height":"400px",
+                   "border-color":"#FFFFFF",
+                   "border-width":"3px",
+               },
+            ],['challenge','Hkm-bk1']]],
+            ],
+            unlocked(){return player.Hkm.storyUnlocked >= 15},
+            buttonStyle(){return {'background-color': '#b1b1b1', 'opacity': '1', 'background-image':  'linear-gradient(30deg, #9e9e9e 12%, transparent 12.5%, transparent 87%, #9e9e9e 87.5%, #9e9e9e), linear-gradient(150deg, #9e9e9e 12%, transparent 12.5%, transparent 87%, #9e9e9e 87.5%, #9e9e9e), linear-gradient(30deg, #9e9e9e 12%, transparent 12.5%, transparent 87%, #9e9e9e 87.5%, #9e9e9e), linear-gradient(150deg, #9e9e9e 12%, transparent 12.5%, transparent 87%, #9e9e9e 87.5%, #9e9e9e), linear-gradient(60deg, #9e9e9e77 25%, transparent 25.5%, transparent 75%, #9e9e9e77 75%, #9e9e9e77), linear-gradient(60deg, #9e9e9e77 25%, transparent 25.5%, transparent 75%, #9e9e9e77 75%, #9e9e9e77)', 'background-size': '20px 35px',
+            'background-position': '0 0, 0 0, 10px 18px, 10px 18px, 0 0, 10px 18px','box-shadow':'2px 2px grey','border-color':'grey','color':'black'}},
+            style(){
+                return {'background-color': '#111111', 'opacity': '1', 'background-image':  'linear-gradient(30deg, #212121 12%, transparent 12.5%, transparent 87%, #212121 87.5%, #212121), linear-gradient(150deg, #212121 12%, transparent 12.5%, transparent 87%, #212121 87.5%, #212121), linear-gradient(30deg, #212121 12%, transparent 12.5%, transparent 87%, #212121 87.5%, #212121), linear-gradient(150deg, #212121 12%, transparent 12.5%, transparent 87%, #212121 87.5%, #212121), linear-gradient(60deg, #21212177 25%, transparent 25.5%, transparent 75%, #21212177 75%, #21212177), linear-gradient(60deg, #21212177 25%, transparent 25.5%, transparent 75%, #21212177 75%, #21212177)', 'background-size': '20px 35px',
+                    'background-position': '0 0, 0 0, 10px 18px, 10px 18px, 0 0, 10px 18px','color':'black'}}
         },
     }
 })
@@ -3549,6 +3931,13 @@ function hokmaStory(){
                     player.Hkm.storyShowing = 13
                 },
                 unlocked(){return player.Hkm.storyUnlocked >= 13}
+			},
+            14:{
+				text:`14`,
+                onClick(){
+                    player.Hkm.storyShowing = 14
+                },
+                unlocked(){return player.Hkm.storyUnlocked >= 14}
 			},
 		}
 	})
@@ -3755,9 +4144,57 @@ addLayer("Ain", {
         },
         'Hkm-22':{
             name() {return "Aphasia"},
-            tooltip() { return 'Enable the alchemy battery. (+4 AP, gain a free alchemy battery.)'},
+            tooltip() { return 'Enable the alchemy battery. (+3 AP, gain a free alchemy battery.)'},
             done() { return player.Hkm.storyUnlocked >= 13 && minBatteryLevel().gte(2)}, 
             onComplete() {return player.Ain.points = player.Ain.points.add(3)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-23':{
+            name() {return "The hatred of the fireflies"},
+            tooltip() { return 'Unlock all of Kether upgrades.(25 upgrades) (+4 AP)'},
+            done() { return hasUpgrade('Ktr','Ktr-25')}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(4)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-24':{
+            name() {return "Playground"},
+            tooltip() { return 'Enable the leaf battery. (+4 AP, gain a free leaf battery and the amount of eternal batteries affects Ktr-21.)'},
+            done() { return minBatteryLevel().gte(3)}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(4)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-25':{
+            name() {return "Broken Sky"},
+            tooltip() { return 'Have 2<sup>7</sup> time throems. (+4 AP, sutract 20 from the cost of Te5.)'},
+            done() { return player.Hkm.timeThroem.gte(128)}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(4)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-26':{
+            name() {return "Rubbish Sorting"},
+            tooltip() { return 'Enable the aqua battery. (+4 AP, sutract 20 from the cost of Te3 again and gain a free aqua battery.)'},
+            done() { return minBatteryLevel().gte(4)}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(4)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-27':{
+            name() {return "Dreamland"},
+            tooltip() { return 'Have 15 eternal batteries. (+4 AP, the effect of Ktr-19 and Ktr-24 are also appealed to time energy gain.)'},
+            done() { return getBuyableAmount('Hkm','Hkm-b1').add(getBuyableAmount('Hkm','Hkm-b2')).add(getBuyableAmount('Hkm','Hkm-b3')).gte(15)}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(4)
+            },
+			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
+        },
+        'Hkm-28':{
+            name() {return "Electron"},
+            tooltip() { return 'Have 10×2<sup>4</sup> time throems. (+4 AP)'},
+            done() { return player.Hkm.timeThroem.gte(160)}, 
+            onComplete() {return player.Ain.points = player.Ain.points.add(4)
             },
 			style() { if(hasAchievement(this.layer,this.id)) return {'background-color':'grey','box-shadow':'grey 0px 2px 2px'} },
         },
@@ -3806,16 +4243,15 @@ addLayer("Ain", {
                         "background-color":"#AAAAAA",
                     }],
                     ["column", [["raw-html", function() {}],
-                     "blank",['display-text',function(){return '<h3>[Stage 2-4] Unstable timeline<br>Unlock all achievement in this row to unlock the ultimate challenge of Hokma!<br> (There will be 7 achievements in future version)'}],
+                     "blank",['display-text',function(){return '<h3>[Stage 2-4] Unstable timeline<br>Unlock all achievement in this row to unlock the ultimate challenge of Hokma!'}],
                     ['row',[["achievement",'Hkm-22'],["achievement",'Hkm-23'],["achievement",'Hkm-24'],["achievement",'Hkm-25'],["achievement",'Hkm-26'],["achievement",'Hkm-27'],["achievement",'Hkm-28']]],
                     "blank",
                     ],
                     {
-                        "color":"black",
-                        "width":"700px",
-                        "border-color":"#FFFFFF",
-                        "border-width":"3px",
-                        "background-color":"#AAAAAA",
+                        'color':'black',
+                        'background-color': '#c2c2c2',
+                        'opacity': '1',
+                        'background': 'linear-gradient(135deg, #afafaf55 25%, transparent 25%) -10px 0/ 20px 20px, linear-gradient(225deg, #afafaf 25%, transparent 25%) -10px 0/ 20px 20px, linear-gradient(315deg, #afafaf55 25%, transparent 25%) 0px 0/ 20px 20px, linear-gradient(45deg, #afafaf 25%, #c2c2c2 25%) 0px 0/ 20px 20px',          
                     }],
                 ],
                 buttonStyle() {return {"color":"#FFFFFF",
@@ -3863,6 +4299,7 @@ function getEffect(data, id){
     if(id == 504) effect = Decimal.pow(12,player.Ktr.upgrades.length)
     if((id % 100 != 3) && (id % 100 != 5)) effect = effect.pow(tmp.Hkm.gridStrength)
     if(id % 100 == 5) effect = n(1.05)
+    if(id == 404) effect = effect.min(6)
     return effect
 }
 

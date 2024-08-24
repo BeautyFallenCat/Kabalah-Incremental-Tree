@@ -13,8 +13,8 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "Hkm.Hal.10",
-	name: "Voltage Era",
+	num: "Hkm.Hbc.11",
+	name: "Final Frontier",
 }
 
 let changelog = ``
@@ -215,14 +215,19 @@ var displayThings = [
 		if ((player.points.add(1).log10().gte(240)) && (player.points.add(1).log10().lt(494)))
 			return "<text style='color:grey'>[2nd Hokma Dimension] If you write 2 numbers per second, writing down your essence amount will need " + formatTime(player.points.add(1).log10().div(2)) + ". During this period, the author has already completed " + format(player.points.add(1).log10().div(2).div(60).div(3.75).mul(100)) + "% of 800m run."
 	}, function() {
-		if ((player.points.add(1).log10().gte(494)) && (player.points.add(1).log10().lt(14400)))
+		if ((player.points.add(1).log10().gte(494)) && (player.points.add(1).log10().lt(3600)))
 			return "<text style='color:grey'>[3rd Hokma Dimension] If you write 2 numbers per second, and determine to end writing in 2024, you need to start at 2023/12/31 " + formatTime(n(86400).sub(player.points.add(1).log10().div(2))) + ". (An average Chinese people go bed at 23:30)"
 	},
+	function() {
+		if ((player.points.add(1).log10().gte(3600)) && (player.points.add(1).log10().lt(7500)))
+			return "<text style='color:grey'>[4th Hokma Dimension] If you write 2 numbers per second, and determine to end writing in 2024, you need to start at 2023/12/31 " + formatTime(n(86400).sub(player.points.add(1).log10().div(2))) + ". (An average World people go bed at 22:55)"
+	},
+	
 ]
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("e2700"))
+	return player.points.gte(new Decimal("e4050"))
 }
 
 

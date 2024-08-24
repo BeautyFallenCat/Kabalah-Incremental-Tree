@@ -141,7 +141,13 @@ function Hokmapath(){
 	ctx.stroke();
 	ctx.strokeStyle = 'green';
 	ctx.beginPath();
-	ctx.moveTo(xk-Number(n(50).add(player.points.add(1).log(10).sub(200).div(22.5).min(150))), yk);
+	ctx.moveTo(xk-Number(n(50).add(player.points.add(1).log(10).sub(200).div(45).min(150))), yk);
 	ctx.lineTo(xk, yk);
 	ctx.stroke();
+	if(player.points.gte(1e6400)){
+	    ctx.moveTo(xk-225, yk-25);
+		ctx.lineTo(xk-200, yk);
+		ctx.arc(xk-228,yk-28,5,0,2*Math.PI)
+		ctx.stroke();
+	}
 }

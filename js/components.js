@@ -684,10 +684,10 @@ const Modal = {
 				</div>
 				<div v-if="Modal.data.bind" :is="Modal.data.bind" :data="Modal.data.bindData"></div>
 				<div v-html="Modal.data.text()" style="text-align: left; padding: 10px"></div>
-				<div style="position: absolute; bottom: 120px; left: 47%; width:100%; transform: translateX(-50%); text-align: center">
+				<div style="position: absolute; bottom: 120px; left: 50%; width:100%; transform: translateX(-50%); text-align: center">
 					<button class='tabButton' v-for="(btn,i) in Modal.data.buttons" @click="btn.onClick" style="min-width: 5px; margin: 0 5px" v-bind:style='[{"border-color": Modal.data.color,"opacity": btn.unlocked()? "1":"0","visibility": btn.unlocked()? "visible":"hidden"}]'>{{btn.text}}</button>
 				</div>
-				<div v-bind:style='[{"border-color": Modal.data.color}]' style="border: 2px solid white;border-radius:5px; height: 25px; position: absolute; bottom: 50px; left: 44%; width: 100px; font-size:20px; padding:10px"
+				<div v-bind:style='[{"border-color": Modal.data.color}]' style="border: 2px solid white;border-radius:5px; height: 25px; position: absolute; bottom: 10px; left: 44%; width: 100px; font-size:20px; padding:10px"
 					onclick="Modal.closeFunc()">Confirm
 				</div>
 			</div>`
